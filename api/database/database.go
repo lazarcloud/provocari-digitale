@@ -14,10 +14,13 @@ func Connect() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err = DB.Exec(`CREATE TABLE IF NOT EXISTS solves (
+		_, err = DB.Exec(`CREATE TABLE IF NOT EXISTS tests (
 			id BLOB PRIMARY KEY NOT NULL,
 			problem_id BLOB NOT NULL,
-			code TEXT NOT NULL
+			max_memory TEXT NOT NULL,
+			time_taken TEXT NOT NULL,
+			output TEXT NOT NULL,
+			error TEXT NOT NULL
 		)`)
 		if err != nil {
 			log.Fatal(err)
@@ -30,9 +33,9 @@ func Connect() {
 	}
 }
 
-func InsertSolve(problemID string, code string) {
-	_, err := DB.Exec("INSERT INTO solves (id, problem_id, code) VALUES (?, ?, ?)", GenerateUUID(), problemID, code)
+func InsertSolve(id string, problemID string, maxMemory string, timeTaken string, output string, error string) {
+	_, err := DB.Exec("INSERT INTO tests (id, problem_id, max_memory, time_taken, output, error) VALUES (?, ?, ?, ?, ?, ?)", id, problemID, maxMemory, timeTaken, output, error)
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 }

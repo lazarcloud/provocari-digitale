@@ -8,5 +8,5 @@ int main() {
     A[i] = 7;
   }
   std::cout << "lazar";
-  return 0;
+  a return 0;
 }
