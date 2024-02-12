@@ -1,75 +1,120 @@
 package main
 
 import (
-	"context"
-	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
+	"github.com/gorilla/mux"
+	"github.com/lazarcloud/provocari-digitale/api/data/database"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-func main() {
-	dockerClient, err := client.NewClientWithOpts(client.FromEnv)
+type Item struct {
+	ID         string `json:"id"`
+	Problem_ID string `json:"problem_id"`
+	Code       string `json:"code"`
+}
+
+func getItems(w http.ResponseWriter, r *http.Request) {
+	var items []Item
+	rows, err := database.DB.Query("SELECT id, problem_id, code FROM solves")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item Item
+		err := rows.Scan(&item.ID, &item.Problem_ID, &item.Code)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		items = append(items, item)
 	}
 
-	imageName := "cpp-executor:latest"
+	json.NewEncoder(w).Encode(items)
+}
 
-	// read main.cpp form filesystem and convert it to base64
-
+func main() {
+	os.Remove("./database.sqlite")
 	fileContent, err := os.ReadFile("./data/main.cpp")
 	if err != nil {
 		fmt.Printf("Error reading main.cpp: %v\n", err)
 		return
 	}
+	database.Connect()
+	database.InsertSolve(database.GenerateUUID(), string(fileContent))
+	r := mux.NewRouter()
+	r.HandleFunc("/items", getItems).Methods("GET")
 
-	// Encode the file content to base64
-	cppBase64 := base64.StdEncoding.EncodeToString(fileContent)
+	fmt.Println("Server started on port 8080")
+	log.Fatal(http.ListenAndServe(":8080", r))
 
-	envVars := map[string]string{
-		"CPP_SOURCE_BASE64": cppBase64,
-	}
-	var envList []string
-	for key, value := range envVars {
-		envList = append(envList, fmt.Sprintf("%s=%s", key, value))
-	}
+	// 	dockerClient, err := client.NewClientWithOpts(client.FromEnv)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
 
-	// Define container configuration
-	containerConfig := &container.Config{
-		Image: imageName,
-		Env:   envList,
-	}
+	// 	imageName := "cpp-executor:latest"
 
-	hostConfig := &container.HostConfig{
-		AutoRemove: true,
-		Resources:  container.Resources{
-			// Memory: 64 * 1024 * 1024, // 256MB
-			// CPUPeriod: 100000,1
-			// CPUQuota:  10000, // 10ms (10% of a single CPU core)
-		},
-	}
+	// 	// read main.cpp form filesystem and convert it to base64
 
-	// Create the Docker container
-	resp, err := dockerClient.ContainerCreate(context.Background(), containerConfig, hostConfig, nil, nil, "")
-	if err != nil {
-		fmt.Printf("Error creating Docker container: %v\n", err)
-		return
-	}
-	// measure its stats
+	// 	fileContent, err := os.ReadFile("./data/main.cpp")
+	// 	if err != nil {
+	// 		fmt.Printf("Error reading main.cpp: %v\n", err)
+	// 		return
+	// 	}
 
-	fmt.Println("Docker container created successfully!")
-	fmt.Printf("Container ID: %s\n", resp.ID)
+	// 	// Encode the file content to base64
+	// 	cppBase64 := base64.StdEncoding.EncodeToString(fileContent)
 
-	// Start the Docker container
-	err = dockerClient.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
-	if err != nil {
-		fmt.Printf("Error starting Docker container: %v\n", err)
-		return
-	}
+	// 	envVars := map[string]string{
+	// 		"CPP_SOURCE_BASE64": cppBase64,
+	// 	}
+	// 	var envList []string
+	// 	for key, value := range envVars {
+	// 		envList = append(envList, fmt.Sprintf("%s=%s", key, value))
+	// 	}
 
-	fmt.Println("Docker container started successfully!")
+	// 	// Define container configuration
+	// 	containerConfig := &container.Config{
+	// 		Image: imageName,
+	// 		Env:   envList,
+	// 	}
+
+	// 	hostConfig := &container.HostConfig{
+	// 		AutoRemove: true,
+	// 		Resources:  container.Resources{
+	// 			// Memory: 64 * 1024 * 1024, // 256MB
+	// 			// CPUPeriod: 100000,1
+	// 			// CPUQuota:  10000, // 10ms (10% of a single CPU core)
+	// 		},
+	// 	}
+
+	// 	// Create the Docker container
+	// 	resp, err := dockerClient.ContainerCreate(context.Background(), containerConfig, hostConfig, nil, nil, "")
+	// 	if err != nil {
+	// 		fmt.Printf("Error creating Docker container: %v\n", err)
+	// 		return
+	// 	}
+	// 	// measure its stats
+
+	// 	fmt.Println("Docker container created successfully!")
+	// 	fmt.Printf("Container ID: %s\n", resp.ID)
+
+	// 	// Start the Docker container
+	// 	err = dockerClient.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{})
+	// 	if err != nil {
+	// 		fmt.Printf("Error starting Docker container: %v\n", err)
+	// 		return
+	// 	}
+
+	// 	fmt.Println("Docker container started successfully!")
 }
