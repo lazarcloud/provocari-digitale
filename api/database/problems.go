@@ -78,6 +78,16 @@ func UpdateProblem(id string, updatedProblem Problem) error {
 	return nil
 }
 
+func IsProblemOwner(id string, userID string) (bool, error) {
+	var ownerID string
+	err := DB.QueryRow("SELECT owner_id FROM problems WHERE id=?", id).Scan(&ownerID)
+	if err != nil {
+		return false, err
+	}
+	return ownerID == userID, nil
+
+}
+
 // DeleteProblem deletes a problem by its ID.
 func DeleteProblem(id string) error {
 	_, err := DB.Exec("DELETE FROM problems WHERE id=?", id)

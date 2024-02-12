@@ -8,11 +8,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/gorilla/mux"
+	"github.com/lazarcloud/provocari-digitale/api/auth"
+	"github.com/lazarcloud/provocari-digitale/api/auth/jwt"
 	"github.com/lazarcloud/provocari-digitale/api/database"
+	"github.com/lazarcloud/provocari-digitale/api/globals"
+	"github.com/lazarcloud/provocari-digitale/api/utils"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -114,6 +119,16 @@ func solve(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
+	publicKey, err := jwt.CreateJWTWithClaims(globals.AuthAccessType, time.Hour*10000, "", globals.AuthRolePublic)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("Public key: " + publicKey)
+
 	os.Remove("./database.sqlite")
 	database.Connect()
 	r := mux.NewRouter()
@@ -147,18 +162,12 @@ func main() {
 		w.Write([]byte("OK"))
 	}).Methods("POST")
 
-	r.HandleFunc("/api/problems", database.GetProblemsHandler).Methods("GET")
-	r.HandleFunc("/api/problems", database.CreateProblemHandler).Methods("POST")
-	r.HandleFunc("/api/problems/{id}", database.GetProblemHandler).Methods("GET")
-	r.HandleFunc("/api/problems/{id}", database.UpdateProblemHandler).Methods("PUT")
-	r.HandleFunc("/api/problems/{id}", database.DeleteProblemHandler).Methods("DELETE")
+	problemsRouter := r.PathPrefix("/api/problems").Subrouter()
+	database.PrepareProblemsRouter(problemsRouter)
+	problemsRouter.Use(auth.JWTMiddleware)
 
-	fmt.Println("Server started on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
-
-	// fmt.Println("Server is listening on http://0.0.0.0:8080")
-	// if err := http.ListenAndServe("0.0.0.0:8080", nil); err != nil {
-	// 	fmt.Printf("Error starting server: %s\n", err)
-	// }
+	fmt.Printf("Server is running on port %d...\n", globals.ApiPort)
+	http.Handle("/", utils.CORSHandler.Handler(r))
+	panic(http.ListenAndServe(fmt.Sprintf(":%d", globals.ApiPort), nil))
 
 }

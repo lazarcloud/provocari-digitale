@@ -9,6 +9,9 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/lazarcloud/provocari-digitale/api/auth"
+	"github.com/lazarcloud/provocari-digitale/api/globals"
+	"github.com/lazarcloud/provocari-digitale/api/utils"
 	_ "github.com/mattn/go-sqlite3" // Import sqlite3 driver
 )
 
@@ -19,12 +22,19 @@ type ErrorResponse struct {
 
 // CreateProblemHandler handles POST requests to create a new problem.
 func CreateProblemHandler(w http.ResponseWriter, r *http.Request) {
+	userID := auth.GetUserId(r)
+	if userID == "" {
+		writeJSONError(w, "You are not allowed to create a problem, please log in", http.StatusForbidden)
+		return
+	}
 	var problem Problem
 	err := json.NewDecoder(r.Body).Decode(&problem)
 	if err != nil {
 		writeJSONError(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	problem.OwnerID = userID
 
 	err = CreateProblem(problem)
 	if err != nil {
@@ -85,8 +95,15 @@ func GetProblemsHandler(w http.ResponseWriter, r *http.Request) {
 
 // UpdateProblemHandler handles PUT requests to update an existing problem by ID.
 func UpdateProblemHandler(w http.ResponseWriter, r *http.Request) {
+	userID := auth.GetUserId(r)
 	vars := mux.Vars(r)
 	problemID := vars["id"]
+
+	canDel, _ := IsProblemOwner(userID, problemID)
+	if !canDel {
+		writeJSONError(w, "You are not allowed to delete this problem", http.StatusForbidden)
+		return
+	}
 
 	var updatedProblem Problem
 	err := json.NewDecoder(r.Body).Decode(&updatedProblem)
@@ -106,8 +123,18 @@ func UpdateProblemHandler(w http.ResponseWriter, r *http.Request) {
 
 // DeleteProblemHandler handles DELETE requests to delete a problem by ID.
 func DeleteProblemHandler(w http.ResponseWriter, r *http.Request) {
+	role := auth.GetRole(r)
+	userID := auth.GetUserId(r)
 	vars := mux.Vars(r)
 	problemID := vars["id"]
+
+	if role != globals.AuthRoleService {
+		canDel, _ := IsProblemOwner(userID, problemID)
+		if !canDel {
+			writeJSONError(w, "You are not allowed to delete this problem", http.StatusForbidden)
+			return
+		}
+	}
 
 	err := DeleteProblem(problemID)
 	if err != nil {
@@ -141,8 +168,7 @@ func GetProblemHandler(w http.ResponseWriter, r *http.Request) {
 // writeJSONError writes a JSON error response with the given message and status code.
 func writeJSONError(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(ErrorResponse{Error: message})
+	utils.RespondWithError(w, message)
 }
 
 // writeEmptyJSON writes an empty JSON response.
@@ -152,17 +178,10 @@ func writeEmptyJSON(w http.ResponseWriter) {
 	fmt.Fprintf(w, "{}")
 }
 
-func main() {
-	r := mux.NewRouter()
-
-	r.HandleFunc("/api/problems", GetProblemsHandler).Methods("GET")
-	r.HandleFunc("/api/problems", CreateProblemHandler).Methods("POST")
-	r.HandleFunc("/api/problems/{id}", GetProblemHandler).Methods("GET")
-	r.HandleFunc("/api/problems/{id}", UpdateProblemHandler).Methods("PUT")
-	r.HandleFunc("/api/problems/{id}", DeleteProblemHandler).Methods("DELETE")
-
-	http.Handle("/", r)
-
-	fmt.Println("Server is running...")
-	http.ListenAndServe(":8080", nil)
+func PrepareProblemsRouter(problemsRouter *mux.Router) {
+	problemsRouter.HandleFunc("", GetProblemsHandler).Methods("GET")
+	problemsRouter.HandleFunc("", CreateProblemHandler).Methods("POST")
+	problemsRouter.HandleFunc("/{id}", GetProblemHandler).Methods("GET")
+	problemsRouter.HandleFunc("/{id}", UpdateProblemHandler).Methods("PUT")
+	problemsRouter.HandleFunc("/{id}", DeleteProblemHandler).Methods("DELETE")
 }

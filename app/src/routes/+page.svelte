@@ -1,2 +1,9 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+  import { fetchAPI } from "$lib"
+</script>
+
+{#await fetchAPI("/api/problems") then data}
+  {JSON.stringify(data)}
+{:catch error}
+  <p>{error.message}</p>
+{/await}
