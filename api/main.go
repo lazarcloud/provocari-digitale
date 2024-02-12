@@ -147,6 +147,12 @@ func main() {
 		w.Write([]byte("OK"))
 	}).Methods("POST")
 
+	r.HandleFunc("/api/problems", database.GetProblemsHandler).Methods("GET")
+	r.HandleFunc("/api/problems", database.CreateProblemHandler).Methods("POST")
+	r.HandleFunc("/api/problems/{id}", database.GetProblemHandler).Methods("GET")
+	r.HandleFunc("/api/problems/{id}", database.UpdateProblemHandler).Methods("PUT")
+	r.HandleFunc("/api/problems/{id}", database.DeleteProblemHandler).Methods("DELETE")
+
 	fmt.Println("Server started on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 

@@ -30,25 +30,32 @@ func Connect() {
 			output TEXT NOT NULL,
 			error TEXT NOT NULL
 		)`)
+		createTable(`CREATE TABLE IF NOT EXISTS users (
+			id BLOB PRIMARY KEY NOT NULL,
+			username TEXT NOT NULL,
+			email TEXT NOT NULL,
+			password TEXT NOT NULL
+		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS problems (
 			id BLOB PRIMARY KEY NOT NULL,
+			owner_id BLOB NOT NULL,
 			max_memory TEXT NOT NULL,
 			max_time TEXT NOT NULL,
-			description TEXT NOT NULL,
+			description TEXT NOT NULL
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS solve_sources (
 			id BLOB PRIMARY KEY NOT NULL,
 			problem_id BLOB NOT NULL,
-			file BLOB NOT NULL,
+			file BLOB NOT NULL
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS solve_compiled_sources (
 			id BLOB PRIMARY KEY NOT NULL,
 			source_id BLOB NOT NULL,
-			file BLOB NOT NULL,
+			file BLOB NOT NULL
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS compilation_tasks (
 			id BLOB PRIMARY KEY NOT NULL,
-			source_id BLOB NOT NULL,
+			source_id BLOB NOT NULL
 		)`)
 
 	} else {
