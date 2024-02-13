@@ -18,8 +18,8 @@
 
 <style>
   h1 {
-    font-size: 4rem;
-    margin-top: 16rem;
+    font-size: clamp(2rem, 10vw, 4rem);
+    /* margin-top: 4em; */
   }
   span {
     font-family: "Protest Riot", sans-serif;

@@ -114,8 +114,8 @@
   }
   a {
     text-decoration: none;
-    font-weight: 400;
     color: var(--accent);
+    text-wrap: nowrap;
   }
   a.active {
     opacity: 1;
