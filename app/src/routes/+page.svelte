@@ -17,9 +17,6 @@
 {/await} -->
 
 <style>
-  .container {
-    padding: 1rem;
-  }
   h1 {
     font-size: 4rem;
     margin-top: 16rem;

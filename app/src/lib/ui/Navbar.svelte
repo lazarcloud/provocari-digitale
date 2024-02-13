@@ -1,8 +1,14 @@
 <script>
   import { page } from "$app/stores"
 
-  let path = $page.url.password
-  $: path = $page.url.password
+  let path = $page.url.pathname
+  $: path = $page.url.pathname
+  var right = 0
+  $: if (path) {
+    if (path == "/") right = 15.7
+    if (path == "/problems/") right = 10.5
+    if (path == "/login/") right = 3.25
+  }
 
   let show = false
 
@@ -24,7 +30,7 @@
 
 <nav>
   <div>
-    <a href="/"><img src="/logo.png" alt="logo" /></a>
+    <a style="opacity:1;" href="/"><img src="/logo.png" alt="logo" /></a>
     <!-- <div class="line"></div>
       <a href="/"><img src="/logo.png" alt="logo" /></a> -->
   </div>
@@ -32,6 +38,7 @@
   <div class="burger">
     <a
       href="#menu"
+      style="opacity:1;"
       on:click|preventDefault={() => {
         show = !show
       }}
@@ -46,28 +53,25 @@
 
   <div class="content {show ? 'show' : ''}">
     <a
-      href="#home"
+      href="/"
       class={path == "/" ? "active" : ""}
-      on:click|preventDefault={() => {
-        gotoElement("home")
-      }}>Probleme</a
-    >
+      on:click={() => (show = false)}
+      >Acasă
+    </a>
     <a
-      href="#projects"
-      class={path == "" ? "active" : ""}
-      on:click|preventDefault={() => {
-        gotoElement("projects")
-      }}>Soluții</a
-    >
+      href="/problems"
+      class={path == "/problems/" ? "active" : ""}
+      on:click={() => (show = false)}
+      >Probleme
+    </a>
     <a
-      href="#contact"
-      class={path == "" ? "active" : ""}
-      on:click|preventDefault={() => {
-        gotoElement("contact")
-      }}>Descriere</a
-    >
+      href="/login"
+      class={path == "/login/" ? "active" : ""}
+      on:click={() => (show = false)}
+      >Loghează-te
+    </a>
   </div>
-  <img class="rift" src="/rift.png" alt="rift" />
+  <img class="rift" src="/rift.png" alt="rift" style="right:{right}rem;" />
 </nav>
 
 <style>
@@ -82,7 +86,6 @@
     margin: 0 1rem;
   }
   nav {
-    background-color: var(--bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -96,26 +99,27 @@
     border-bottom: 1px solid var(--text);
   }
   .rift {
+    width: 4rem;
     position: absolute;
     bottom: -43%;
-    right: 12.5rem;
     z-index: -1;
+    transition: right 0.6s ease-out;
   }
   div,
   a {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: 1.5rem;
   }
   a {
     text-decoration: none;
-    /* color: inherit; */
+    font-weight: 400;
     color: var(--accent);
   }
-  /* a.active {
-      color: var(--accent);
-    } */
+  a.active {
+    opacity: 1;
+  }
 
   .burger {
     display: none;
