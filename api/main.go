@@ -166,6 +166,10 @@ func main() {
 	database.PrepareProblemsRouter(problemsRouter)
 	problemsRouter.Use(auth.JWTMiddleware)
 
+	authRouter := r.PathPrefix("/api/auth").Subrouter()
+	database.PrepareAuthRouter(authRouter)
+	authRouter.Use(auth.JWTMiddleware)
+
 	fmt.Printf("Server is running on port %d...\n", globals.ApiPort)
 	http.Handle("/", utils.CORSHandler.Handler(r))
 	panic(http.ListenAndServe(fmt.Sprintf(":%d", globals.ApiPort), nil))

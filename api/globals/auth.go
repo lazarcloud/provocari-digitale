@@ -1,5 +1,7 @@
 package globals
 
+import "time"
+
 var AuthIssuer = "lazar"
 
 var AuthSecretJWTKey = []byte("secret")
@@ -32,6 +34,8 @@ func AuthIsValidType(t string) bool {
 
 var AuthAccessType = "access"
 var AuthRefreshType = "refresh"
+var AuthAccessTypeDuration = time.Hour * 24
+var AuthRefreshTypeDuration = time.Hour * 24 * 30
 
 type ContextCustomKey string
 

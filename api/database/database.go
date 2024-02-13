@@ -32,9 +32,11 @@ func Connect() {
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS users (
 			id BLOB PRIMARY KEY NOT NULL,
+			created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INT)),
 			username TEXT NOT NULL,
 			email TEXT NOT NULL,
-			password TEXT NOT NULL
+			password TEXT NOT NULL,
+			verified BOOLEAN NOT NULL DEFAULT FALSE
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS problems (
 			id BLOB PRIMARY KEY NOT NULL,
