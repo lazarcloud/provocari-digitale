@@ -40,10 +40,12 @@ func Connect() {
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS problems (
 			id BLOB PRIMARY KEY NOT NULL,
+			title TEXT NOT NULL,
 			owner_id BLOB NOT NULL,
 			max_memory TEXT NOT NULL,
 			max_time TEXT NOT NULL,
-			description TEXT NOT NULL
+			description TEXT NOT NULL,
+			FOREIGN KEY(owner_id) REFERENCES users(id)
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS solve_sources (
 			id BLOB PRIMARY KEY NOT NULL,
@@ -69,9 +71,31 @@ func Connect() {
 }
 
 func Populate() {
-	_, err := DB.Exec("INSERT INTO problems (id, max_memory, max_time, description) VALUES (?, ?, ?, ?)", "1", "256", "1", "Test problem")
+	statement, err := DB.Prepare("INSERT INTO users (id, email, password, username) VALUES (?, ?, ?, ?)")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err.Error())
+	}
+	_, err = statement.Exec("laz", "system", "", GenerateRandomUsername())
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	problems := []struct {
+		id          string
+		maxMemory   string
+		maxTime     string
+		description string
+		title       string
+	}{
+		{"1", "256", "1", "Test problem 1", "1 pb"},
+		{"2", "512", "2", "Test problem 2", "2 pb"},
+		{"3", "1024", "3", "Test problem 3", "3 pb"},
+	}
+
+	for _, problem := range problems {
+		_, err := DB.Exec("INSERT INTO problems (id, title, owner_id, max_memory, max_time, description) VALUES (?, ?, ?, ?, ?, ?)", problem.id, problem.title, "laz", problem.maxMemory, problem.maxTime, problem.description)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 

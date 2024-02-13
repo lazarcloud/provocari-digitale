@@ -131,6 +131,7 @@ func main() {
 
 	os.Remove("./database.sqlite")
 	database.Connect()
+	database.Populate()
 	r := mux.NewRouter()
 	r.HandleFunc("/items", getItems).Methods("GET")
 	r.HandleFunc("/solve", solve).Methods("GET")

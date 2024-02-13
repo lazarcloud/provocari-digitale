@@ -7,17 +7,23 @@ import (
 
 type Problem struct {
 	ID          string `json:"id"`
+	Title       string `json:"title"`
 	OwnerID     string `json:"owner_id"`
 	MaxMemory   string `json:"max_memory"`
 	MaxTime     string `json:"max_time"`
 	Description string `json:"description"`
+	OwnerEmail  string `json:"owner_email"`
 }
 
 // GetAllProblems returns a slice of all problems with pagination support.
 func GetAllProblems(page, pageSize int) ([]Problem, error) {
 	offset := (page - 1) * pageSize
 
-	rows, err := DB.Query("SELECT id, owner_id, max_memory, max_time, description FROM problems LIMIT ? OFFSET ?", pageSize, offset)
+	rows, err := DB.Query(`
+		SELECT p.id, p.title, p.owner_id, p.max_memory, p.max_time, p.description, u.email 
+		FROM problems p 
+		INNER JOIN users u ON p.owner_id = u.id 
+		LIMIT ? OFFSET ?`, pageSize, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +32,7 @@ func GetAllProblems(page, pageSize int) ([]Problem, error) {
 	var problems []Problem
 	for rows.Next() {
 		var problem Problem
-		err := rows.Scan(&problem.ID, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description)
+		err := rows.Scan(&problem.ID, &problem.Title, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description, &problem.OwnerEmail)
 		if err != nil {
 			return nil, err
 		}
@@ -35,6 +41,7 @@ func GetAllProblems(page, pageSize int) ([]Problem, error) {
 
 	return problems, nil
 }
+
 func GetTotalProblems() (int, error) {
 	var total int
 	err := DB.QueryRow("SELECT COUNT(*) FROM problems").Scan(&total)
@@ -46,8 +53,8 @@ func GetTotalProblems() (int, error) {
 
 // CreateProblem creates a new problem.
 func CreateProblem(problem Problem) error {
-	_, err := DB.Exec("INSERT INTO problems (id, owner_id, max_memory, max_time, description) VALUES (?, ?, ?, ?, ?)",
-		problem.ID, problem.OwnerID, problem.MaxMemory, problem.MaxTime, problem.Description)
+	_, err := DB.Exec("INSERT INTO problems (id, title, owner_id, max_memory, max_time, description) VALUES (?, ?, ?, ?, ?, ?)",
+		problem.ID, problem.Title, problem.OwnerID, problem.MaxMemory, problem.MaxTime, problem.Description)
 	if err != nil {
 		return err
 	}
@@ -57,8 +64,8 @@ func CreateProblem(problem Problem) error {
 // GetProblemByID retrieves a problem by its ID.
 func GetProblemByID(id string) (*Problem, error) {
 	var problem Problem
-	err := DB.QueryRow("SELECT id, owner_id, max_memory, max_time, description FROM problems WHERE id = ?", id).
-		Scan(&problem.ID, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description)
+	err := DB.QueryRow("SELECT id, title, owner_id, max_memory, max_time, description FROM problems WHERE id = ?", id).
+		Scan(&problem.ID, &problem.Title, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description)
 	if err == sql.ErrNoRows {
 		return nil, errors.New("problem not found")
 	}
@@ -70,8 +77,8 @@ func GetProblemByID(id string) (*Problem, error) {
 
 // UpdateProblem updates an existing problem.
 func UpdateProblem(id string, updatedProblem Problem) error {
-	_, err := DB.Exec("UPDATE problems SET owner_id=?, max_memory=?, max_time=?, description=? WHERE id=?",
-		updatedProblem.OwnerID, updatedProblem.MaxMemory, updatedProblem.MaxTime, updatedProblem.Description, id)
+	_, err := DB.Exec("UPDATE problems SET owner_id=?, title=?, max_memory=?, max_time=?, description=? WHERE id=?",
+		updatedProblem.OwnerID, updatedProblem.Title, updatedProblem.MaxMemory, updatedProblem.MaxTime, updatedProblem.Description, id)
 	if err != nil {
 		return err
 	}

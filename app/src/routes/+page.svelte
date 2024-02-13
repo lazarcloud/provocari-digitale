@@ -10,12 +10,6 @@
   </h1>
 </div>
 
-<!-- {#await fetchAPI("/api/problems") then data}
-  {JSON.stringify(data)}
-{:catch error}
-  <p>{error.message}</p>
-{/await} -->
-
 <style>
   h1 {
     font-size: clamp(2rem, 10vw, 4rem);
