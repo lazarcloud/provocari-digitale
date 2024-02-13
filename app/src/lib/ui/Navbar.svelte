@@ -1,5 +1,6 @@
 <script>
   import { page } from "$app/stores"
+  import { refresh, userData } from "$lib"
 
   let path = $page.url.pathname
   $: path = $page.url.pathname
@@ -64,12 +65,25 @@
       on:click={() => (show = false)}
       >Probleme
     </a>
-    <a
-      href="/login"
-      class={path == "/login/" ? "active" : ""}
-      on:click={() => (show = false)}
-      >Loghează-te
-    </a>
+    {#if $refresh != ""}
+      <a
+        href="#logout"
+        class={path == "/logout/" ? "active" : ""}
+        on:click={() => {
+          show = false
+          refresh.set("")
+          userData.set("")
+        }}
+        >Ieși din cont
+      </a>
+    {:else}
+      <a
+        href="/login"
+        class={path == "/login/" ? "active" : ""}
+        on:click={() => (show = false)}
+        >Loghează-te
+      </a>
+    {/if}
   </div>
   <img class="rift" src="/rift.png" alt="rift" style="right:{right}rem;" />
 </nav>

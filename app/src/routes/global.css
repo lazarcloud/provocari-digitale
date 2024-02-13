@@ -37,7 +37,8 @@ button {
   border-radius: 0.5rem;
   border: none;
 }
-button {
+button,
+input[type="submit"] {
   cursor: pointer;
   padding: 0.5rem 2rem;
   background-color: var(--bg);

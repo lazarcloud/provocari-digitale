@@ -55,6 +55,41 @@ func CreateNewUser(email string, password string) (userId string, err error) {
 	return myUUID, nil
 }
 
+func GetUserById(id string) (map[string]interface{}, error) {
+	if id == "" {
+		return nil, errors.New("userId cannot be empty")
+	}
+
+	// Get user from db
+	rows, err := DB.Query("SELECT id, created_at, email, password FROM users WHERE id = ?", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var user map[string]interface{} = make(map[string]interface{}, 0)
+	for rows.Next() {
+		var id []byte
+		var createdAt int64
+		var email string
+		var password string
+		err := rows.Scan(&id, &createdAt, &email, &password)
+		if err != nil {
+			return nil, err
+		}
+
+		readableId := uuid.UUID(id).String()
+		user = map[string]interface{}{
+			"id":         readableId,
+			"created_at": createdAt,
+			"email":      email,
+			"password":   password,
+		}
+	}
+
+	return user, nil
+}
+
 func GetUserByEmail(email string) (map[string]interface{}, error) {
 	// Check if email or password is empty
 	if email == "" {

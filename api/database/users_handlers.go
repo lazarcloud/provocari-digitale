@@ -12,9 +12,9 @@ import (
 )
 
 type RegisterRequest struct {
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	Password2 string `json:"password2"`
+	Email           string `json:"email"`
+	Password        string `json:"password"`
+	ConfirmPassword string `json:"confirmPassword"`
 }
 type LoginRequest struct {
 	Email    string `json:"email"`
@@ -53,14 +53,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	password2 := registerRequest.Password2
+	confirmPassword := registerRequest.ConfirmPassword
 
-	if password2 == "" {
+	if confirmPassword == "" {
 		utils.RespondWithError(w, "Password2 cannot be empty")
 		return
 	}
 
-	if password != password2 {
+	if password != confirmPassword {
 		utils.RespondWithError(w, "Passwords do not match")
 		return
 	}
@@ -162,7 +162,29 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		"expiresIn":    globals.AuthRefreshTypeDuration,
 	})
 }
-func PrepareAuthRouter(problemsRouter *mux.Router) {
-	problemsRouter.HandleFunc("/login", LoginHandler).Methods("GET")
-	problemsRouter.HandleFunc("/register", RegisterHandler).Methods("GET")
+func GetEmailHandler(w http.ResponseWriter, r *http.Request) {
+
+	userId := auth.GetUserId(r)
+
+	if userId == "" {
+		utils.RespondWithError(w, "Not logged in")
+		return
+	}
+
+	user, err := GetUserById(userId)
+	if err != nil {
+		utils.RespondWithError(w, err.Error())
+		return
+	}
+
+	utils.RespondWithSuccess(w, map[string]interface{}{
+		"status": "ok",
+		"email":  user["email"],
+	})
+
+}
+func PrepareAuthRouter(authRouter *mux.Router) {
+	authRouter.HandleFunc("/login", LoginHandler).Methods("POST")
+	authRouter.HandleFunc("/register", RegisterHandler).Methods("POST")
+	authRouter.HandleFunc("/email", GetEmailHandler).Methods("GET")
 }
