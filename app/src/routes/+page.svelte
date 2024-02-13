@@ -2,8 +2,32 @@
   import { fetchAPI } from "$lib"
 </script>
 
-{#await fetchAPI("/api/problems") then data}
+<div class="container">
+  <h1>
+    Puntea <span>riftului</span><br />
+    dintre <span>probleme</span><br />
+    și <span>soluții.</span><br />
+  </h1>
+</div>
+
+<!-- {#await fetchAPI("/api/problems") then data}
   {JSON.stringify(data)}
 {:catch error}
   <p>{error.message}</p>
-{/await}
+{/await} -->
+
+<style>
+  .container {
+    padding: 1rem;
+  }
+  h1 {
+    font-size: 4rem;
+    margin-top: 16rem;
+  }
+  span {
+    font-family: "Protest Riot", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.1em;
+  }
+</style>
