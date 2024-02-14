@@ -1,91 +1,60 @@
 package main
 
 import (
-	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"os/exec"
-	"strings"
+	"runtime"
+	"time"
 )
 
-type Output struct {
-	MaxMemory string `json:"max_memory"`
-	TimeTaken string `json:"time_taken"`
-	Output    string `json:"output"`
-	Error     string `json:"error"`
-	ProblemID string `json:"problem_id"`
-}
-
-func finish(answer Output) {
-	answer.ProblemID = os.Getenv("PROBLEM_ID")
-	solveID := os.Getenv("SOLVE_ID")
-	api := "http://host.docker.internal:8080/api/submit/" + solveID
-
-	jsonData, err := json.Marshal(answer)
-	if err != nil {
-		fmt.Println("Error encoding JSON:", err)
-		return
-	}
-
-	resp, err := http.Post(api, "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		fmt.Println("Error sending POST request:", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Unexpected response status:", resp.Status)
-		return
-	}
-
-	fmt.Println(answer)
-}
-
 func main() {
-	// Decode the base64-encoded executable
-	executableBase64 := os.Getenv("EXECUTABLE_BASE64")
-	executable, err := base64.StdEncoding.DecodeString(executableBase64)
-	if err != nil {
-		finish(Output{Error: "Error decoding base64"})
+	cppSourceBase64 := os.Getenv("CPP_SOURCE_BASE64")
+	if cppSourceBase64 == "" {
+		fmt.Println("No source code provided")
 		return
 	}
-
-	// Write the decoded executable to a file
-	err = os.WriteFile("executable", executable, 0755) // Set executable permission
+	cppSource, err := base64.StdEncoding.DecodeString(cppSourceBase64)
 	if err != nil {
-		finish(Output{Error: "Error writing executable"})
+		fmt.Println("Error decoding base64")
 		return
 	}
-
-	// Run the executable and capture stdout and stderr
-	cmd := exec.Command("./executable")
+	fmt.Println("Source code decoded successfully")
+	err = os.WriteFile("main.cpp", cppSource, 0755)
+	if err != nil {
+		fmt.Println("Error writing source code")
+		return
+	}
+	fmt.Println("Source code written successfully")
+	//compile the source code
+	cmd := exec.Command("g++", "main.cpp", "-o", "executable")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		finish(Output{Error: "Error running executable"})
+		fmt.Println("Error compiling source code")
+		return
+	}
+	fmt.Println("Source code compiled successfully")
+
+	//measure the time and memory usage
+	var m1, m2 runtime.MemStats
+	start := time.Now()
+	runtime.ReadMemStats(&m1) //read memory stats before execution
+	cmd = exec.Command("./executable")
+	output, err = cmd.CombinedOutput() //run the executable
+	runtime.ReadMemStats(&m2)          //read memory stats after execution
+	elapsed := time.Since(start)       //calculate elapsed time
+
+	if err != nil {
+		fmt.Println("Error running program")
+		fmt.Println(err.Error())
 		return
 	}
 
-	// Parse output to extract max memory and time taken
-	timeLines := strings.Split(string(output), "\n")
-	var maxMemory, timeTaken string
-	for _, line := range timeLines {
-		if strings.HasPrefix(line, "Max Memory:") {
-			maxMemory = strings.TrimSpace(strings.TrimPrefix(line, "Max Memory:"))
-		} else if strings.HasPrefix(line, "Elapsed Time:") {
-			timeTaken = strings.TrimSpace(strings.TrimPrefix(line, "Elapsed Time:"))
-		}
-	}
-
-	finish(Output{
-		MaxMemory: maxMemory,
-		TimeTaken: timeTaken,
-		Output:    string(output),
-		Error:     "",
-	})
+	fmt.Println("Max Memory:", m2.TotalAlloc-m1.TotalAlloc) //print the difference in total allocated memory
+	fmt.Println("Elapsed Time:", elapsed)                   //print the elapsed time
+	fmt.Println("Output:", string(output))                  //print the output of the executable
+	return
 
 	// Clean up temporary file
 	os.Remove("executable")

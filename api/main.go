@@ -51,7 +51,7 @@ func getItems(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(items)
 }
 
-func solve(w http.ResponseWriter, r *http.Request) {
+func solve() {
 
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
@@ -74,7 +74,7 @@ func solve(w http.ResponseWriter, r *http.Request) {
 	envVars := map[string]string{
 		"CPP_SOURCE_BASE64": cppBase64,
 		"SOLVE_ID":          database.GenerateUUID(),
-		"PROBLEM_ID":        "1",
+		"PROBLEM_ID":        "1234",
 	}
 	var envList []string
 	for key, value := range envVars {
@@ -120,6 +120,14 @@ func solve(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	// os.Remove("./database.sqlite")
+	// database.Connect()
+	// database.Populate()
+
+	solve()
+
+	return
+
 	publicKey, err := jwt.CreateJWTWithClaims(globals.AuthAccessType, time.Hour*10000, "", globals.AuthRolePublic)
 
 	if err != nil {
@@ -129,12 +137,9 @@ func main() {
 
 	fmt.Println("Public key: " + publicKey)
 
-	os.Remove("./database.sqlite")
-	database.Connect()
-	database.Populate()
 	r := mux.NewRouter()
 	r.HandleFunc("/items", getItems).Methods("GET")
-	r.HandleFunc("/solve", solve).Methods("GET")
+	// r.HandleFunc("/solve", solve).Methods("GET")
 
 	r.HandleFunc("/api/submit/{id}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

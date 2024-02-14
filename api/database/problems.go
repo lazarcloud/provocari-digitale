@@ -103,3 +103,51 @@ func DeleteProblem(id string) error {
 	}
 	return nil
 }
+
+type Test struct {
+	ID        string `json:"id"`
+	ProblemID string `json:"problem_id"`
+	Input     string `json:"input"`
+	Output    string `json:"output"`
+	Count     int    `json:"count"`
+}
+
+func GetAllTests(problemID string) ([]Test, error) {
+	rows, err := DB.Query("SELECT id, input, output, count FROM tests WHERE problem_id=?", problemID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tests []Test
+	for rows.Next() {
+		var test Test
+		err := rows.Scan(&test.ID, &test.Input, &test.Output, &test.Count)
+		if err != nil {
+			return nil, err
+		}
+		tests = append(tests, test)
+	}
+
+	return tests, nil
+}
+
+func GetAllTestsJSON(problemID string) ([]string, error) {
+	rows, err := DB.Query("SELECT input, output FROM tests WHERE problem_id=?", problemID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tests []string
+	for rows.Next() {
+		var input, output string
+		err := rows.Scan(&input, &output)
+		if err != nil {
+			return nil, err
+		}
+		tests = append(tests, input, output)
+	}
+
+	return tests, nil
+}
