@@ -8,10 +8,8 @@ RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o app .
 
 # Second stage: Final image
-FROM gcc:latest
-
-# Install time for time command
-RUN apt-get update && apt-get install -y time
+FROM alpine:latest
+RUN apk --no-cache add g++ valgrind
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /app/app /app/app

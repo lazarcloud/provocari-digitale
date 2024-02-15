@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
-	"time"
+	"syscall"
 )
 
 func main() {
@@ -26,35 +25,56 @@ func main() {
 		fmt.Println("Error writing source code")
 		return
 	}
+	defer os.Remove("main.cpp")
+
 	fmt.Println("Source code written successfully")
-	//compile the source code
+
+	// Compile the source code
 	cmd := exec.Command("g++", "main.cpp", "-o", "executable")
-	output, err := cmd.CombinedOutput()
+	_, err = cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("Error compiling source code")
+		fmt.Println(err)
 		return
 	}
 	fmt.Println("Source code compiled successfully")
 
-	//measure the time and memory usage
-	var m1, m2 runtime.MemStats
-	start := time.Now()
-	runtime.ReadMemStats(&m1) //read memory stats before execution
+	// Run the executable and get its process ID
 	cmd = exec.Command("./executable")
-	output, err = cmd.CombinedOutput() //run the executable
-	runtime.ReadMemStats(&m2)          //read memory stats after execution
-	elapsed := time.Since(start)       //calculate elapsed time
-
+	err = cmd.Start()
 	if err != nil {
-		fmt.Println("Error running program")
-		fmt.Println(err.Error())
+		fmt.Println("Error running executable")
+		fmt.Println(err)
 		return
 	}
+	pid := cmd.Process.Pid
+	fmt.Println("Executable running with PID:", pid)
 
-	fmt.Println("Max Memory:", m2.TotalAlloc-m1.TotalAlloc) //print the difference in total allocated memory
-	fmt.Println("Elapsed Time:", elapsed)                   //print the elapsed time
-	fmt.Println("Output:", string(output))                  //print the output of the executable
-	return
+	// Wait for the executable to finish
+	err = cmd.Wait()
+	if err != nil {
+		fmt.Println("Error waiting for executable")
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Executable finished successfully")
+
+	// Get the memory usage of the executable from the OS
+	// This is platform specific and may vary depending on the OS
+	// Here we use the syscall package to get the resource usage of the process
+	// See https://pkg.go.dev/syscall#Rusage for details
+	var rusage syscall.Rusage
+	err = syscall.Getrusage(syscall.RUSAGE_CHILDREN, &rusage)
+	if err != nil {
+		fmt.Println("Error getting resource usage")
+		fmt.Println(err)
+		return
+	}
+	// The Maxrss field is the maximum resident set size in kilobytes
+	// This is the amount of memory occupied by the process in RAM
+	// See https://man7.org/linux/man-pages/man2/getrusage.2.html for details
+	memUsage := rusage.Maxrss
+	fmt.Println("Memory usage:", memUsage, "KB")
 
 	// Clean up temporary file
 	os.Remove("executable")
