@@ -120,13 +120,9 @@ func solve() {
 
 func main() {
 
-	// os.Remove("./database.sqlite")
-	// database.Connect()
-	// database.Populate()
-
-	solve()
-
-	return
+	os.Remove("./database.sqlite")
+	database.Connect()
+	database.Populate()
 
 	publicKey, err := jwt.CreateJWTWithClaims(globals.AuthAccessType, time.Hour*10000, "", globals.AuthRolePublic)
 
