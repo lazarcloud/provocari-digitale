@@ -1,0 +1,15 @@
+for every problem we have
+input file string
+output file string
+
+
+types:
+in,out lists
+in + solver
+in + checker
+
+to fix memory usage
+
+tests.in list
+tests.out
+or console inputs

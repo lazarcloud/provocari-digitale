@@ -1,3 +1,0 @@
-docker build -t cpp-executor -f .\CPPDockerfile .
-
-docker run -v /path/to/example.cpp:/app/example.cpp cpp-executor /app/example.cpp
