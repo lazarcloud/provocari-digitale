@@ -14,7 +14,6 @@ func createTable(sql string) {
 		log.Fatal(err)
 	}
 }
-
 func Connect() {
 	if _, err := os.Stat("./database.sqlite"); os.IsNotExist(err) {
 		DB, err = sql.Open("sqlite3", "./database.sqlite")
@@ -31,6 +30,10 @@ func Connect() {
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS problems (
 			id BLOB PRIMARY KEY NOT NULL,
+			uses_standard_io BOOLEAN NOT NULL DEFAULT TRUE,
+			test_mode TEXT DEFAULT 'NULL',
+			input_file_name TEXT DEFAULT 'NULL',
+			output_file_name TEXT DEFAULT 'NULL',
 			title TEXT NOT NULL,
 			owner_id BLOB NOT NULL,
 			max_memory TEXT NOT NULL,
@@ -87,20 +90,22 @@ func Populate() {
 		log.Fatal(err.Error())
 	}
 	problems := []struct {
-		id          string
-		maxMemory   string
-		maxTime     string
-		description string
-		title       string
+		id               string
+		maxMemory        string
+		maxTime          string
+		description      string
+		title            string
+		uses_standard_io bool
+		test_mode        string
 	}{
-		{"1", "256", "1", "Test problem 1", "1 pb"},
-		{"2", "512", "2", "Test problem 2", "2 pb"},
-		{"3", "1024", "3", "Test problem 3", "3 pb"},
-		{"1234", "1024", "3", "A + B", "Citește două numere întregi din cin și afișează suma lor în cout."},
+		{"1", "256", "1", "Test problem 1", "1 pb", true, "NULL"},
+		{"2", "512", "2", "Test problem 2", "2 pb", true, "NULL"},
+		{"3", "1024", "3", "Test problem 3", "3 pb", true, "NULL"},
+		{"1234", "1024", "3", "A + B", "Citește două numere întregi din cin și afișează suma lor în cout.", true, "individualFiles"},
 	}
 
 	for _, problem := range problems {
-		_, err := DB.Exec("INSERT INTO problems (id, title, owner_id, max_memory, max_time, description) VALUES (?, ?, ?, ?, ?, ?)", problem.id, problem.title, "laz", problem.maxMemory, problem.maxTime, problem.description)
+		_, err := DB.Exec("INSERT INTO problems (id, title, owner_id, max_memory, max_time, description, uses_standard_io, test_mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", problem.id, problem.title, "laz", problem.maxMemory, problem.maxTime, problem.description, problem.uses_standard_io, problem.test_mode)
 		if err != nil {
 			log.Fatal(err)
 		}

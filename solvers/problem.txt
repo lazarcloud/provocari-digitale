@@ -15,4 +15,6 @@ tests.out
 or console inputs
 
 
+
+null
 individualFiles

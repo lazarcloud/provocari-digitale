@@ -10,8 +10,8 @@ var validTestingModes = []string{"individualFiles"}
 func main() {
 	// Get problem details
 
-	isStandardIO := getEnv("IS_STANDARD_IO")
-	testingMode := getEnv("TESTING_MODE")
+	isStandardIO := getEnv("USES_STANDARD_IO")
+	testingMode := getEnv("TEST_MODE")
 	problemInputFile := getEnv("PROBLEM_INPUT_FILE")
 	problemOutputFile := getEnv("PROBLEM_OUTPUT_FILE")
 	numberOfTestCases := parseInt(getEnv("NUMBER_OF_TEST_CASES"))

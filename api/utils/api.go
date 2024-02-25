@@ -33,3 +33,11 @@ func RespondWithSuccess(w http.ResponseWriter, message map[string]interface{}) {
 func RespondWithUnauthorized(w http.ResponseWriter, message string) {
 	RespondWithJson(w, http.StatusUnauthorized, map[string]interface{}{"error": message})
 }
+
+func DecodeJSONBody(w http.ResponseWriter, r *http.Request, v interface{}) error {
+	err := json.NewDecoder(r.Body).Decode(v)
+	if err != nil {
+		return err
+	}
+	return nil
+}

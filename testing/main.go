@@ -8,6 +8,7 @@ import (
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/lazarcloud/provocari-digitale/api/database"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -20,7 +21,36 @@ func getBase64FileContent(filename string) string {
 	return base64.StdEncoding.EncodeToString(fileContent)
 }
 
+func getFileContent(filename string) string {
+	fileContent, err := os.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("Error reading %s: %v\n", filename, err)
+		return ""
+	}
+	return string(fileContent)
+}
+
 func main() {
+
+	database.Connect()
+
+	problem, err := database.GetProblemByID("1234")
+	if err != nil {
+		fmt.Println("Error getting problem:", err)
+		return
+	}
+	fmt.Println(problem)
+	return
+
+	ok, err := database.CreateTestContainer("1234", getFileContent("./data/main.cpp"))
+	if err != nil {
+		fmt.Printf("Error creating Docker container: %v\n", err)
+	}
+	if !ok {
+		fmt.Println("Failed to create Docker container")
+	}
+
+	return
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		panic(err)
@@ -31,6 +61,8 @@ func main() {
 	envVars := map[string]string{
 		"IS_STANDARD_IO":       "true",
 		"TESTING_MODE":         "individualFiles",
+		"INPUT_FILE":           "input.txt",
+		"OUTPUT_FILE":          "output.txt",
 		"SOURCE_BASE64":        getBase64FileContent("./data/main.cpp"),
 		"NUMBER_OF_TEST_CASES": "3",
 		"INPUT_0_BASE64":       getBase64FileContent("./input/1.in"),

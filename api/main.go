@@ -172,6 +172,9 @@ func main() {
 	database.PrepareAuthRouter(authRouter)
 	authRouter.Use(auth.JWTMiddleware)
 
+	solveRouter := r.PathPrefix("/api/solve").Subrouter()
+	solveRouter.HandleFunc("/submit/{id}", database.SolveHandler).Methods("POST")
+
 	fmt.Printf("Server is running on port %d...\n", globals.ApiPort)
 	http.Handle("/", utils.CORSHandler.Handler(r))
 	panic(http.ListenAndServe(fmt.Sprintf(":%d", globals.ApiPort), nil))

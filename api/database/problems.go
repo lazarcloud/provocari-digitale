@@ -6,13 +6,17 @@ import (
 )
 
 type Problem struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	OwnerID     string `json:"owner_id"`
-	MaxMemory   string `json:"max_memory"`
-	MaxTime     string `json:"max_time"`
-	Description string `json:"description"`
-	OwnerEmail  string `json:"owner_email"`
+	ID             string `json:"id"`
+	OwnerID        string `json:"owner_id"`
+	OwnerEmail     string `json:"owner_email"`
+	Title          string `json:"title"`
+	MaxMemory      string `json:"max_memory"`
+	MaxTime        string `json:"max_time"`
+	Description    string `json:"description"`
+	UsesStandardIO bool   `json:"uses_standard_io"`
+	TestMode       string `json:"test_mode"`
+	InputFileName  string `json:"input_file_name"`
+	OutputFileName string `json:"output_file_name"`
 }
 
 // GetAllProblems returns a slice of all problems with pagination support.
@@ -20,7 +24,7 @@ func GetAllProblems(page, pageSize int) ([]Problem, error) {
 	offset := (page - 1) * pageSize
 
 	rows, err := DB.Query(`
-		SELECT p.id, p.title, p.owner_id, p.max_memory, p.max_time, p.description, u.email 
+		SELECT p.id, p.title, p.owner_id, p.max_memory, p.max_time, p.description, p.uses_standard_io, p.test_mode, p.input_file_name, p.output_file_name, u.email 
 		FROM problems p 
 		INNER JOIN users u ON p.owner_id = u.id 
 		LIMIT ? OFFSET ?`, pageSize, offset)
@@ -32,7 +36,7 @@ func GetAllProblems(page, pageSize int) ([]Problem, error) {
 	var problems []Problem
 	for rows.Next() {
 		var problem Problem
-		err := rows.Scan(&problem.ID, &problem.Title, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description, &problem.OwnerEmail)
+		err := rows.Scan(&problem.ID, &problem.Title, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description, &problem.UsesStandardIO, &problem.TestMode, &problem.InputFileName, &problem.OutputFileName, &problem.OwnerEmail)
 		if err != nil {
 			return nil, err
 		}
@@ -64,8 +68,8 @@ func CreateProblem(problem Problem) error {
 // GetProblemByID retrieves a problem by its ID.
 func GetProblemByID(id string) (*Problem, error) {
 	var problem Problem
-	err := DB.QueryRow("SELECT id, title, owner_id, max_memory, max_time, description FROM problems WHERE id = ?", id).
-		Scan(&problem.ID, &problem.Title, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description)
+	err := DB.QueryRow("SELECT id, title, owner_id, max_memory, max_time, description, uses_standard_io, test_mode, input_file_name, output_file_name FROM problems WHERE id = ?", id).
+		Scan(&problem.ID, &problem.Title, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description, &problem.UsesStandardIO, &problem.TestMode, &problem.InputFileName, &problem.OutputFileName)
 	if err == sql.ErrNoRows {
 		return nil, errors.New("problem not found")
 	}
