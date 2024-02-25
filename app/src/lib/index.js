@@ -1,6 +1,14 @@
 import { get, writable } from "svelte/store"
-export const refresh = writable("")
-export const userData = writable("")
+import Cookies from "js-cookie"
+export const refresh = writable(Cookies.get("refresh") || "")
+refresh.subscribe((value) => {
+  Cookies.set("refresh", value)
+})
+
+export const userData = writable(Cookies.get("userData") || "")
+userData.subscribe((value) => {
+  Cookies.set("userData", value)
+})
 
 var baseUrl = "http://localhost:8080"
 var token =

@@ -64,6 +64,7 @@ func Connect() {
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS tests_groups (
 			id BLOB PRIMARY KEY NOT NULL,
+			created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INT)),
 			user_id BLOB NOT NULL,
 			problem_id BLOB NOT NULL,
 			final_score TEXT DEFAULT 'NULL',

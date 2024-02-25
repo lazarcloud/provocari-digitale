@@ -179,6 +179,8 @@ func main() {
 	solveRouter := r.PathPrefix("/api/solve").Subrouter()
 	solveRouter.HandleFunc("/submit/{id}", database.SolveHandler).Methods("POST")
 	solveRouter.HandleFunc("/progress/{id}", database.GetSolveProgressHandler).Methods("GET") // TO DO: security for writing data and timestamps for test with status of created, to run, ran, finished and final score in test group
+	solveRouter.HandleFunc("/{id}", database.GetUserSolvesHandler).Methods("GET")
+
 	solveRouter.Use(auth.JWTMiddleware)
 
 	fmt.Printf("Server is running on port %d...\n", globals.ApiPort)

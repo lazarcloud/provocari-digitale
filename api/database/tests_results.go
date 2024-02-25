@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -121,6 +122,8 @@ func UpdateTestResultHandler(w http.ResponseWriter, r *http.Request) { //TO DO: 
 }
 
 func GetSolveProgressHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	test_group_id := vars["id"]
 
 	// check if user is owner of the test group
 	type TestGroup struct {
@@ -134,19 +137,23 @@ func GetSolveProgressHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := DB.QueryRow("SELECT max_score, final_score, problem_id, test_count, user_id FROM tests_groups WHERE id=?", test_group_id).Scan(&testGroup.MaxScore, &testGroup.FinalScore, &testGroup.ProblemID, &testGroup.TestCount, &testGroup.UserID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			utils.RespondWithError(w, "Test group not found")
+			return
+		}
 		utils.RespondWithError(w, "Failed to query database")
+		fmt.Println(err.Error())
 		return
 	}
 
 	currentUserId := auth.GetUserId(r)
 
 	if currentUserId != testGroup.UserID {
+		fmt.Println(currentUserId)
+		fmt.Println(testGroup.UserID)
 		utils.RespondWithError(w, "Unauthorized")
 		return
 	}
-
-	vars := mux.Vars(r)
-	test_group_id := vars["id"]
 
 	type TestResult struct {
 		MaxMemory string `json:"max_memory"`
