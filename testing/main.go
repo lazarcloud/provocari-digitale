@@ -29,13 +29,13 @@ func main() {
 	imageName := "cpp-executor:latest"
 
 	envVars := map[string]string{
-		"SOURCE_BASE64":        getBase64FileContent("./data/test.cpp"),
+		"IS_STANDARD_IO":       "true",
+		"TESTING_MODE":         "individualFiles",
+		"SOURCE_BASE64":        getBase64FileContent("./data/main.cpp"),
 		"NUMBER_OF_TEST_CASES": "3",
 		"INPUT_0_BASE64":       getBase64FileContent("./input/1.in"),
 		"INPUT_1_BASE64":       getBase64FileContent("./input/2.in"),
 		"INPUT_2_BASE64":       getBase64FileContent("./input/3.in"),
-		"PROBLEM_INPUT_FILE":   "cin",
-		"PROBLEM_OUTPUT_FILE":  "cout",
 		"OUTPUT_0_BASE64":      getBase64FileContent("./output/1.out"),
 		"OUTPUT_1_BASE64":      getBase64FileContent("./output/2.out"),
 		"OUTPUT_2_BASE64":      getBase64FileContent("./output/3.out"),

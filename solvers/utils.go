@@ -34,3 +34,19 @@ func parseInt(s string) int {
 	}
 	return i
 }
+
+func compareFiles(file1, file2 string) bool {
+	fmt.Println("Comparing files", file1, file2)
+	content1, err := os.ReadFile(file1)
+	if err != nil {
+		fmt.Println("Error reading file1:", err)
+		return false
+	}
+	content2, err := os.ReadFile(file2)
+	if err != nil {
+		fmt.Println("Error reading file2:", err)
+		return false
+	}
+	fmt.Println("Comparing", string(content1), string(content2))
+	return string(content1) == string(content2)
+}

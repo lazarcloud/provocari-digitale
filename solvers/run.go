@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func runCPP(executableFile string, inputFile string) (err error, memory int64, executionTime time.Duration) {
+func runCPP(executableFile string, inputFile string, outputFile string) (err error, memory int64, executionTime time.Duration) {
 	cmd := exec.Command(executableFile)
 
 	// Open the input file
@@ -23,7 +23,7 @@ func runCPP(executableFile string, inputFile string) (err error, memory int64, e
 	cmd.Stdin = infile
 
 	// Create the output file
-	outfile, err := os.Create("console.out")
+	outfile, err := os.Create(outputFile)
 	if err != nil {
 		fmt.Println("Error creating output file")
 		return err, 0, 0

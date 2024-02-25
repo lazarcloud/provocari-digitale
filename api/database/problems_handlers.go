@@ -184,4 +184,8 @@ func PrepareProblemsRouter(problemsRouter *mux.Router) {
 	problemsRouter.HandleFunc("/{id}", GetProblemHandler).Methods("GET")
 	problemsRouter.HandleFunc("/{id}", UpdateProblemHandler).Methods("PUT")
 	problemsRouter.HandleFunc("/{id}", DeleteProblemHandler).Methods("DELETE")
+
+	// tests
+
+	problemsRouter.HandleFunc("/{id}/testscount", GetProblemTestsCountHandler).Methods("GET")
 }

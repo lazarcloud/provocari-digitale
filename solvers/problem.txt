@@ -13,3 +13,6 @@ to fix memory usage
 tests.in list
 tests.out
 or console inputs
+
+
+individualFiles
