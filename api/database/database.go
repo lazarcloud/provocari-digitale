@@ -49,20 +49,39 @@ func Connect() {
 			count INTEGER NOT NULL,
 			FOREIGN KEY(problem_id) REFERENCES problems(id)
 		)`)
-		createTable(`CREATE TABLE IF NOT EXISTS solve_sources (
+		createTable(`CREATE TABLE IF NOT EXISTS tests_results (
 			id BLOB PRIMARY KEY NOT NULL,
+			test_id BLOB NOT NULL,
+			test_group_id BLOB NOT NULL,
+			max_memory TEXT NOT NULL,
+			time_taken TEXT NOT NULL,
+			output BLOB NOT NULL,
+			error BLOB NOT NULL,
+			correct BOOLEAN NOT NULL DEFAULT FALSE,
+			FOREIGN KEY(test_id) REFERENCES tests(id),
+			FOREIGN KEY(test_group_id) REFERENCES tests_groups(id)
+		)`)
+		createTable(`CREATE TABLE IF NOT EXISTS tests_groups (
+			id BLOB PRIMARY KEY NOT NULL,
+			user_id BLOB NOT NULL,
 			problem_id BLOB NOT NULL,
-			file BLOB NOT NULL
+			FOREIGN KEY(user_id) REFERENCES users(id),
+			FOREIGN KEY(problem_id) REFERENCES problems(id)
 		)`)
-		createTable(`CREATE TABLE IF NOT EXISTS solve_compiled_sources (
-			id BLOB PRIMARY KEY NOT NULL,
-			source_id BLOB NOT NULL,
-			file BLOB NOT NULL
-		)`)
-		createTable(`CREATE TABLE IF NOT EXISTS compilation_tasks (
-			id BLOB PRIMARY KEY NOT NULL,
-			source_id BLOB NOT NULL
-		)`)
+		// createTable(`CREATE TABLE IF NOT EXISTS solve_sources (
+		// 	id BLOB PRIMARY KEY NOT NULL,
+		// 	problem_id BLOB NOT NULL,
+		// 	file BLOB NOT NULL
+		// )`)
+		// createTable(`CREATE TABLE IF NOT EXISTS solve_compiled_sources (
+		// 	id BLOB PRIMARY KEY NOT NULL,
+		// 	source_id BLOB NOT NULL,
+		// 	file BLOB NOT NULL
+		// )`)
+		// createTable(`CREATE TABLE IF NOT EXISTS compilation_tasks (
+		// 	id BLOB PRIMARY KEY NOT NULL,
+		// 	source_id BLOB NOT NULL
+		// )`)
 
 	} else {
 		DB, err = sql.Open("sqlite3", "./database.sqlite")
@@ -118,6 +137,15 @@ func Populate() {
 		count     int
 	}{
 		{"1234", "1 2", "3", 0},
+		{"1234", "5 4", "9", 0},
+		{"1234", "1 5", "6", 0},
+		{"1234", "4 7", "11", 0},
+		{"1234", "3 7", "10", 0},
+		{"1234", "1 9", "10", 0},
+		{"1234", "5 8", "13", 0},
+		{"1234", "8 9", "17", 0},
+		{"1234", "21 4", "25", 0},
+		{"1234", "5 5", "10", 0},
 	}
 	for _, test := range tests {
 		_, err := DB.Exec("INSERT INTO tests (id, problem_id, input, output, count) VALUES (?, ?, ?, ?, ?)", GenerateUUID(), test.problemID, test.input, test.output, test.count)

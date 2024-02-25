@@ -14,7 +14,7 @@ func convertToBase64(content string) string {
 	return base64.StdEncoding.EncodeToString([]byte(content))
 }
 
-func CreateTestContainer(problemID string, solution string) (bool, error) {
+func CreateTestContainer(problemID string, solution string) (bool, string, error) {
 
 	fmt.Println("Creating Docker container...")
 
@@ -23,7 +23,7 @@ func CreateTestContainer(problemID string, solution string) (bool, error) {
 
 	problemData, err := GetProblemByID(problemID)
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 
 	fmt.Println("Problem data:", problemData)
@@ -33,7 +33,7 @@ func CreateTestContainer(problemID string, solution string) (bool, error) {
 	// Create a new test container
 	dockerClient, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 
 	environmentVariables := map[string]string{}
@@ -50,19 +50,32 @@ func CreateTestContainer(problemID string, solution string) (bool, error) {
 	environmentVariables["PROBLEM_OUTPUT_FILE"] = problemData.OutputFileName
 	testCount, err := GetProblemTestsCount(problemID) // TO DO: optimize this in one sql query
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 	environmentVariables["NUMBER_OF_TEST_CASES"] = fmt.Sprintf("%d", testCount)
 
 	// Get all tests for the problem
 	tests, err := GetAllTests(problemID)
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 
 	for i, test := range tests {
 		environmentVariables[fmt.Sprintf("INPUT_%d_BASE64", i)] = convertToBase64(test.Input)
 		environmentVariables[fmt.Sprintf("OUTPUT_%d_BASE64", i)] = convertToBase64(test.Output)
+	}
+
+	testGroupId, err := CreateTestGroup(problemID, "fun_user")
+	if err != nil {
+		return false, "", err
+	}
+
+	for i, test := range tests { //TO DO: login users
+		test_id, err := CreateTestResult(test.ID, testGroupId)
+		if err != nil {
+			return false, "", err
+		}
+		environmentVariables[fmt.Sprintf("TEST_%d_ID", i)] = test_id
 	}
 
 	var envList []string
@@ -89,7 +102,7 @@ func CreateTestContainer(problemID string, solution string) (bool, error) {
 	// Create the Docker container
 	resp, err := dockerClient.ContainerCreate(context.Background(), containerConfig, hostConfig, nil, nil, "")
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 	// measure its stats
 
@@ -99,10 +112,10 @@ func CreateTestContainer(problemID string, solution string) (bool, error) {
 	// Start the Docker container
 	err = dockerClient.ContainerStart(context.Background(), resp.ID, container.StartOptions{})
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 
 	fmt.Println("Docker container started successfully!")
 
-	return true, nil
+	return true, testGroupId, nil
 }

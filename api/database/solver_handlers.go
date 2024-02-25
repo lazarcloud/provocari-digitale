@@ -36,7 +36,7 @@ func SolveHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ok, err := CreateTestContainer(id, string(code))
+	ok, testGroupId, err := CreateTestContainer(id, string(code))
 
 	if err != nil {
 		utils.RespondWithError(w, "Failed to create test container")
@@ -49,7 +49,8 @@ func SolveHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.RespondWithSuccess(w, map[string]interface{}{
-		"status":     "ok",
-		"problem_id": id,
+		"status":        "ok",
+		"problem_id":    id,
+		"test_group_id": testGroupId,
 	})
 }

@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 func getEnv(key string) string {
@@ -49,4 +53,42 @@ func compareFiles(file1, file2 string) bool {
 	}
 	fmt.Println("Comparing", string(content1), string(content2))
 	return string(content1) == string(content2)
+}
+
+func saveTestResult(testID string, result bool, memory int64, executionTime time.Duration) {
+	api := "http://host.docker.internal:8080/api/solve/update/" + testID
+	type RequestBody struct {
+		MaxMemory string `json:"max_memory"`
+		TimeTaken string `json:"time_taken"`
+		Output    string `json:"output"`
+		Error     string `json:"error"`
+		Correct   bool   `json:"correct"`
+	}
+	requestBody := RequestBody{
+		MaxMemory: strconv.FormatInt(memory, 10),
+		TimeTaken: executionTime.String(),
+		Output:    "",
+		Error:     "",
+		Correct:   result,
+	}
+
+	jsonData, err := json.Marshal(requestBody)
+	if err != nil {
+		fmt.Println("Error encoding JSON:", err)
+		return
+	}
+
+	resp, err := http.Post(api, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println("Error sending POST request:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("Unexpected response status:", resp.Status)
+		return
+	}
+
+	fmt.Println(requestBody)
 }

@@ -48,6 +48,7 @@ func main() {
 	if isStandardIO == "true" && testingMode == "individualFiles" {
 		// loop through the test cases
 		for i := 0; i < numberOfTestCases; i++ {
+			test_id := getEnv(fmt.Sprintf("TEST_%d_ID", i))
 			// Get the input for the test case and write it to a file
 			inputBase64 := getEnv(fmt.Sprintf("INPUT_%d_BASE64", i))
 			input := decodeBase64(inputBase64)
@@ -77,6 +78,9 @@ func main() {
 			}
 
 			fmt.Println("--------------------------------------------------")
+
+			// Save the test result
+			saveTestResult(test_id, correct, memory, executionTime)
 		}
 	}
 
