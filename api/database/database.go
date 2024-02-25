@@ -46,7 +46,7 @@ func Connect() {
 			problem_id BLOB NOT NULL,
 			input BLOB NOT NULL,
 			output BLOB NOT NULL,
-			count INTEGER NOT NULL,
+			score INTEGER DEFAULT 0,
 			FOREIGN KEY(problem_id) REFERENCES problems(id)
 		)`)
 		createTable(`CREATE TABLE IF NOT EXISTS tests_results (
@@ -57,6 +57,7 @@ func Connect() {
 			time_taken TEXT NOT NULL,
 			output BLOB NOT NULL,
 			error BLOB NOT NULL,
+			status TEXT DEFAULT 'waiting',
 			correct BOOLEAN NOT NULL DEFAULT FALSE,
 			FOREIGN KEY(test_id) REFERENCES tests(id),
 			FOREIGN KEY(test_group_id) REFERENCES tests_groups(id)
@@ -65,6 +66,9 @@ func Connect() {
 			id BLOB PRIMARY KEY NOT NULL,
 			user_id BLOB NOT NULL,
 			problem_id BLOB NOT NULL,
+			final_score TEXT DEFAULT 'NULL',
+			max_score TEXT DEFAULT 'NULL',
+			test_count INTEGER DEFAULT 0,
 			FOREIGN KEY(user_id) REFERENCES users(id),
 			FOREIGN KEY(problem_id) REFERENCES problems(id)
 		)`)
@@ -104,7 +108,7 @@ func Populate() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	_, err = statement.Exec(GenerateUUID(), "lazar@lazar.lol", "27568c7bfb1fe49ece7cefed431a638c14ab8b65", GenerateRandomUsername())
+	_, err = statement.Exec("8f3f3855-ff2a-42fd-a595-d14fe683b488", "lazar@lazar.lol", "27568c7bfb1fe49ece7cefed431a638c14ab8b65", GenerateRandomUsername())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -134,21 +138,21 @@ func Populate() {
 		problemID string
 		input     string
 		output    string
-		count     int
+		score     int
 	}{
-		{"1234", "1 2", "3", 0},
-		{"1234", "5 4", "9", 0},
-		{"1234", "1 5", "6", 0},
-		{"1234", "4 7", "11", 0},
-		{"1234", "3 7", "10", 0},
-		{"1234", "1 9", "10", 0},
-		{"1234", "5 8", "13", 0},
-		{"1234", "8 9", "17", 0},
-		{"1234", "21 4", "25", 0},
-		{"1234", "5 5", "10", 0},
+		{"1234", "1 2", "3", 1},
+		{"1234", "5 4", "9", 1},
+		{"1234", "1 5", "6", 1},
+		{"1234", "4 7", "11", 1},
+		{"1234", "3 7", "10", 1},
+		{"1234", "1 9", "10", 1},
+		{"1234", "5 8", "13", 1},
+		{"1234", "8 9", "17", 1},
+		{"1234", "21 4", "25", 1},
+		{"1234", "5 5", "10", 1},
 	}
 	for _, test := range tests {
-		_, err := DB.Exec("INSERT INTO tests (id, problem_id, input, output, count) VALUES (?, ?, ?, ?, ?)", GenerateUUID(), test.problemID, test.input, test.output, test.count)
+		_, err := DB.Exec("INSERT INTO tests (id, problem_id, input, output, score) VALUES (?, ?, ?, ?, ?)", GenerateUUID(), test.problemID, test.input, test.output, test.score)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -6,12 +6,20 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/lazarcloud/provocari-digitale/api/auth"
 	"github.com/lazarcloud/provocari-digitale/api/utils"
 )
 
 func SolveHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
+
+	userId := auth.GetUserId(r)
+
+	if userId == "" {
+		utils.RespondWithUnauthorized(w, "Unauthorized, please login before uploading code")
+		return
+	}
 	// get code string from request body
 
 	type RequestBody struct {
@@ -36,10 +44,11 @@ func SolveHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ok, testGroupId, err := CreateTestContainer(id, string(code))
+	ok, testGroupId, err := CreateTestContainer(id, string(code), userId)
 
 	if err != nil {
 		utils.RespondWithError(w, "Failed to create test container")
+		fmt.Println(err.Error())
 		return
 	}
 

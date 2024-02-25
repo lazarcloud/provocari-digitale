@@ -83,6 +83,8 @@ func main() {
 			saveTestResult(test_id, correct, memory, executionTime)
 		}
 	}
+	test_group_id := getEnv("TEST_GROUP_ID")
+	calculateScores(test_group_id)
 
 	time.Sleep(10 * time.Second)
 }

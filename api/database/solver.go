@@ -14,7 +14,7 @@ func convertToBase64(content string) string {
 	return base64.StdEncoding.EncodeToString([]byte(content))
 }
 
-func CreateTestContainer(problemID string, solution string) (bool, string, error) {
+func CreateTestContainer(problemID string, solution string, usedId string) (bool, string, error) {
 
 	fmt.Println("Creating Docker container...")
 
@@ -65,10 +65,18 @@ func CreateTestContainer(problemID string, solution string) (bool, string, error
 		environmentVariables[fmt.Sprintf("OUTPUT_%d_BASE64", i)] = convertToBase64(test.Output)
 	}
 
-	testGroupId, err := CreateTestGroup(problemID, "fun_user")
+	maxScore, err := GetProblemMaxScore(problemID)
+
 	if err != nil {
 		return false, "", err
 	}
+
+	testGroupId, err := CreateTestGroup(problemID, usedId, fmt.Sprintf("%d", maxScore), testCount)
+	if err != nil {
+		return false, "", err
+	}
+
+	environmentVariables["TEST_GROUP_ID"] = testGroupId
 
 	for i, test := range tests { //TO DO: login users
 		test_id, err := CreateTestResult(test.ID, testGroupId)

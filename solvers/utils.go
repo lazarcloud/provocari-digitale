@@ -92,3 +92,28 @@ func saveTestResult(testID string, result bool, memory int64, executionTime time
 
 	fmt.Println(requestBody)
 }
+
+func calculateScores(test_group_id string) {
+	api := "http://host.docker.internal:8080/api/solve/calculate/" + test_group_id
+	type RequestBody struct {
+		MaxMemory string `json:"max_memory"`
+		TimeTaken string `json:"time_taken"`
+		Output    string `json:"output"`
+		Error     string `json:"error"`
+		Correct   bool   `json:"correct"`
+	}
+
+	resp, err := http.Get(api)
+	if err != nil {
+		fmt.Println("Error sending POST request:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("Unexpected response status:", resp.Status)
+		return
+	}
+
+	fmt.Println("Updated scores")
+}

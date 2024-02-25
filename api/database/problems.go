@@ -113,11 +113,20 @@ type Test struct {
 	ProblemID string `json:"problem_id"`
 	Input     string `json:"input"`
 	Output    string `json:"output"`
-	Count     int    `json:"count"`
+	Score     int    `json:"score"`
+}
+
+func GetProblemMaxScore(problemID string) (int, error) {
+	var maxScore int
+	err := DB.QueryRow("SELECT SUM(score) FROM tests WHERE problem_id=?", problemID).Scan(&maxScore)
+	if err != nil {
+		return 0, err
+	}
+	return maxScore, nil
 }
 
 func GetAllTests(problemID string) ([]Test, error) {
-	rows, err := DB.Query("SELECT id, input, output, count FROM tests WHERE problem_id=?", problemID)
+	rows, err := DB.Query("SELECT id, input, output, score FROM tests WHERE problem_id=?", problemID)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +135,7 @@ func GetAllTests(problemID string) ([]Test, error) {
 	var tests []Test
 	for rows.Next() {
 		var test Test
-		err := rows.Scan(&test.ID, &test.Input, &test.Output, &test.Count)
+		err := rows.Scan(&test.ID, &test.Input, &test.Output, &test.Score)
 		if err != nil {
 			return nil, err
 		}
