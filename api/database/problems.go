@@ -68,8 +68,12 @@ func CreateProblem(problem Problem) error {
 // GetProblemByID retrieves a problem by its ID.
 func GetProblemByID(id string) (*Problem, error) {
 	var problem Problem
-	err := DB.QueryRow("SELECT id, title, owner_id, max_memory, max_time, description, uses_standard_io, test_mode, input_file_name, output_file_name FROM problems WHERE id = ?", id).
-		Scan(&problem.ID, &problem.Title, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description, &problem.UsesStandardIO, &problem.TestMode, &problem.InputFileName, &problem.OutputFileName)
+	err := DB.QueryRow(`
+        SELECT p.id, p.title, p.owner_id, p.max_memory, p.max_time, p.description, p.uses_standard_io, p.test_mode, p.input_file_name, p.output_file_name, u.email 
+        FROM problems p 
+        INNER JOIN users u ON p.owner_id = u.id 
+        WHERE p.id = ?`, id).
+		Scan(&problem.ID, &problem.Title, &problem.OwnerID, &problem.MaxMemory, &problem.MaxTime, &problem.Description, &problem.UsesStandardIO, &problem.TestMode, &problem.InputFileName, &problem.OutputFileName, &problem.OwnerEmail)
 	if err == sql.ErrNoRows {
 		return nil, errors.New("problem not found")
 	}

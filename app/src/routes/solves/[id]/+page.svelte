@@ -1,16 +1,68 @@
 <script>
   import { fetchAPIAuth } from "$lib"
   import { invalidateAll } from "$app/navigation"
+  import { onMount } from "svelte"
 
   export let data
   let id = data.id
+  $: id = data.id
   let pb = data.pb
-  let solution = ""
-  function encodeToBase64(str) {
-    return btoa(unescape(encodeURIComponent(str)))
+  $: pb = data.pb
+  let group = data.pb.group
+  $: group = data.pb.group
+
+  console.log(pb)
+
+  let translations = {
+    NULL: "Așteptare",
+    waiting: "Așteptare",
+    running: "Rulare",
+    finished: "Terminat",
   }
-  let index = 0
+
+  // TO DO: clean up this repeated fetching
+  onMount(async () => {
+    setInterval(async () => {
+      await invalidateAll()
+    }, 1000)
+  })
 </script>
 
-<h1>Problem {id}</h1>
-{JSON.stringify(pb)}
+<div class="container">
+  <h1>Problem {id}</h1>
+  <p>
+    Scor {group.final_score == "NULL"
+      ? "0"
+      : group.final_score}/{group.max_score}
+  </p>
+  <p>ID Problemă: {group.problem_id}</p>
+  <p>Număr teste: {group.test_count}</p>
+  {#each pb.results as result, index}
+    <div>
+      <h2>Test {index}: {translations[result.status]}</h2>
+      <p>{result.correct ? "Corect" : "Greșit"}</p>
+      <p>Memorie necesară: {result.max_memory}</p>
+      <p>Timp necesar: {result.time_taken}</p>
+    </div>
+  {/each}
+</div>
+
+<style>
+  div.container {
+    margin: 10px;
+    padding: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+  }
+  span {
+    opacity: 0.6;
+  }
+</style>

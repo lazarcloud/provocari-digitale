@@ -37,7 +37,7 @@ func UpdateTestResult(id string, max_memory string, time_taken string, output st
 
 func CalculateTestGroupFinalScore(test_group_id string) error { //TO DO: optimize
 	// go through all test results and tests score field and calculate final score
-	var finalScore int
+	finalScore := 0
 	var maxScore int
 	rows, err := DB.Query("SELECT test_id, correct FROM tests_results WHERE test_group_id=?", test_group_id)
 	if err != nil {
@@ -161,11 +161,12 @@ func GetSolveProgressHandler(w http.ResponseWriter, r *http.Request) {
 		Output    string `json:"output"`
 		Error     string `json:"error"`
 		Correct   bool   `json:"correct"`
+		Status    string `json:"status"`
 	}
 
 	var testResults []TestResult
 
-	rows, err := DB.Query("SELECT max_memory, time_taken, output, error, correct FROM tests_results WHERE test_group_id=?", test_group_id)
+	rows, err := DB.Query("SELECT max_memory, time_taken, output, error, correct, status FROM tests_results WHERE test_group_id=?", test_group_id)
 	if err != nil {
 		utils.RespondWithError(w, "Failed to query database")
 		return
@@ -174,7 +175,7 @@ func GetSolveProgressHandler(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var testResult TestResult
-		err = rows.Scan(&testResult.MaxMemory, &testResult.TimeTaken, &testResult.Output, &testResult.Error, &testResult.Correct)
+		err = rows.Scan(&testResult.MaxMemory, &testResult.TimeTaken, &testResult.Output, &testResult.Error, &testResult.Correct, &testResult.Status)
 		if err != nil {
 			utils.RespondWithError(w, "Failed to scan row")
 			return

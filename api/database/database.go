@@ -125,7 +125,7 @@ func Populate() {
 		{"1", "256", "1", "Test problem 1", "1 pb", true, "NULL"},
 		{"2", "512", "2", "Test problem 2", "2 pb", true, "NULL"},
 		{"3", "1024", "3", "Test problem 3", "3 pb", true, "NULL"},
-		{"1234", "1024", "3", "A + B", "Citește două numere întregi din cin și afișează suma lor în cout.", true, "individualFiles"},
+		{"1234", "1024", "3", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
 	}
 
 	for _, problem := range problems {
