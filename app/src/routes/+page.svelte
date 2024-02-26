@@ -1,4 +1,5 @@
 <script>
+  import { goto } from "$app/navigation"
   import { fetchAPI } from "$lib"
 </script>
 
@@ -8,6 +9,7 @@
     dintre <span>probleme</span><br />
     și <span>soluții.</span><br />
   </h1>
+  <button on:click={() => goto("/register")}>{`{ Începe }`}</button>
 </div>
 
 <style>
@@ -23,7 +25,19 @@
   }
   .container {
     display: flex;
-    place-items: center;
+    flex-direction: column;
+    justify-content: center;
     height: 70vh;
+  }
+  button {
+    color: black;
+    background-color: white;
+    border: 1px solid black;
+    transition: all 0.3s ease-in-out;
+    width: 160px;
+  }
+  button:hover {
+    color: white;
+    background-color: black;
   }
 </style>
