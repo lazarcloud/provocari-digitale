@@ -40,8 +40,10 @@ func main() {
 	fmt.Println(string(cppSource))
 	writeFile("./main.cpp", cppSource)
 	fmt.Println("Source code written successfully")
+	test_group_id := getEnv("TEST_GROUP_ID")
 
 	// Compile the source code
+	calculateScores(test_group_id, "compiling")
 	compileCPP("./main.cpp", "executable")
 	fmt.Println("Source code compiled successfully")
 
@@ -80,11 +82,12 @@ func main() {
 			fmt.Println("--------------------------------------------------")
 
 			// Save the test result
-			saveTestResult(test_id, correct, memory, executionTime)
+			saveTestResult(test_id, correct, memory, executionTime, "finished")
+			calculateScores(test_group_id, "running")
+
 		}
 	}
-	test_group_id := getEnv("TEST_GROUP_ID")
-	calculateScores(test_group_id)
+	calculateScores(test_group_id, "finished")
 
 	time.Sleep(10 * time.Second)
 }

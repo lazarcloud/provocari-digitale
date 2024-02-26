@@ -18,6 +18,14 @@
     waiting: "Așteptare",
     running: "Rulare",
     finished: "Terminat",
+    compiling: "Compilare",
+  }
+
+  function getRomanian(message = "", translations = {}) {
+    if (translations.hasOwnProperty(message)) {
+      return translations[message]
+    }
+    return message
   }
 
   // TO DO: clean up this repeated fetching
@@ -37,9 +45,10 @@
   </p>
   <p>ID Problemă: {group.problem_id}</p>
   <p>Număr teste: {group.test_count}</p>
+  <p>Status: {group.status || "finished"}</p>
   {#each pb.results as result, index}
     <div>
-      <h2>Test {index}: {translations[result.status]}</h2>
+      <h2>Test {index}: {getRomanian(result.status, translations)}</h2>
       <p>{result.correct ? "Corect" : "Greșit"}</p>
       <p>Memorie necesară: {result.max_memory}</p>
       <p>Timp necesar: {result.time_taken}</p>

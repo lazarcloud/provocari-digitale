@@ -70,6 +70,7 @@ func Connect() {
 			final_score TEXT DEFAULT 'NULL',
 			max_score TEXT DEFAULT 'NULL',
 			test_count INTEGER DEFAULT 0,
+			status TEXT DEFAULT 'waiting',
 			FOREIGN KEY(user_id) REFERENCES users(id),
 			FOREIGN KEY(problem_id) REFERENCES problems(id)
 		)`)

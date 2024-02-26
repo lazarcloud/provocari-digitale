@@ -157,10 +157,11 @@ type Solve struct {
 	MaxScore   string `json:"max_score"`
 	TestCount  int    `json:"test_count"`
 	CreatedAt  string `json:"created_at"`
+	Status     string `json:"status"`
 }
 
 func GetSolvesByUserId(userId string, problem_id string) ([]Solve, error) {
-	rows, err := DB.Query("SELECT id, problem_id, final_score, max_score, test_count, created_at FROM tests_groups WHERE user_id = ? AND problem_id = ? ORDER BY created_at DESC", userId, problem_id)
+	rows, err := DB.Query("SELECT id, problem_id, final_score, max_score, test_count, created_at, status FROM tests_groups WHERE user_id = ? AND problem_id = ? ORDER BY created_at DESC", userId, problem_id)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +171,7 @@ func GetSolvesByUserId(userId string, problem_id string) ([]Solve, error) {
 
 	for rows.Next() {
 		var solve Solve
-		err := rows.Scan(&solve.ID, &solve.ProblemID, &solve.FinalScore, &solve.MaxScore, &solve.TestCount, &solve.CreatedAt)
+		err := rows.Scan(&solve.ID, &solve.ProblemID, &solve.FinalScore, &solve.MaxScore, &solve.TestCount, &solve.CreatedAt, &solve.Status)
 		if err != nil {
 			return nil, err
 		}
@@ -180,25 +181,12 @@ func GetSolvesByUserId(userId string, problem_id string) ([]Solve, error) {
 	return solves, nil
 }
 
+func GetMaxScorePerProblemPerUser(user_id string, problem_id string) int {
 
-createTable(`CREATE TABLE IF NOT EXISTS tests_groups (
-	id BLOB PRIMARY KEY NOT NULL,
-	created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INT)),
-	user_id BLOB NOT NULL,
-	problem_id BLOB NOT NULL,
-	final_score TEXT DEFAULT 'NULL',
-	max_score TEXT DEFAULT 'NULL',
-	test_count INTEGER DEFAULT 0,
-	FOREIGN KEY(user_id) REFERENCES users(id),
-	FOREIGN KEY(problem_id) REFERENCES problems(id)
-)`)
-
-func GetMaxScorePerProblemPerUser(user_id string, problem_id string) int{
-	
-	rows, err := DB.Query("SELECT max_score FROM tests_groups WHERE user_id = ? AND problem_id = ?", user_id, problem_id)
+	rows, err := DB.Query("SELECT final_score FROM tests_groups WHERE user_id = ? AND problem_id = ?", user_id, problem_id)
 	if err != nil {
 		fmt.Println(err.Error())
-		return
+		return 0
 	}
 	defer rows.Close()
 
@@ -209,7 +197,7 @@ func GetMaxScorePerProblemPerUser(user_id string, problem_id string) int{
 		err := rows.Scan(&maxScore)
 		if err != nil {
 			fmt.Println(err.Error())
-			return
+			return 0
 		}
 		maxScores = append(maxScores, maxScore)
 	}
@@ -217,7 +205,7 @@ func GetMaxScorePerProblemPerUser(user_id string, problem_id string) int{
 	maxScore := 0
 	for _, score := range maxScores {
 		// convert score to int
-		if(score == "NULL") {
+		if score == "NULL" {
 			continue
 		}
 
@@ -231,7 +219,7 @@ func GetMaxScorePerProblemPerUser(user_id string, problem_id string) int{
 	return maxScore
 }
 
-func GetProblemMaxScoreHandler(w http.ResponseWriter, r *http.Request){
+func GetProblemMaxScoreHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	problem_id := vars["id"]
 
@@ -245,7 +233,7 @@ func GetProblemMaxScoreHandler(w http.ResponseWriter, r *http.Request){
 	maxScore := GetMaxScorePerProblemPerUser(userId, problem_id)
 
 	utils.RespondWithSuccess(w, map[string]interface{}{
-		"status": "ok",
+		"status":    "ok",
 		"max_score": maxScore,
 	})
 }

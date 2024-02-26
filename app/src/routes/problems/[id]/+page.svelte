@@ -41,13 +41,16 @@
   {#if $refresh != ""}
     {#key index}
       {#if data.solves.length}
-        <h2>Rezolvările mele</h2>
+        <h2>
+          Rezolvările mele, maxim {data.bestScore} / {data.solves[0].max_score}
+        </h2>
         <table>
           <tr>
             <th>ID Test</th>
             <th>Scor Final</th>
             <th>Scor Maxim</th>
             <th>Nr. teste</th>
+            <th>Status</th>
             <th>Data</th>
           </tr>
           {#each data.solves as test}
@@ -56,6 +59,7 @@
               <td>{test.final_score == "NULL" ? "0" : test.final_score}</td>
               <td>{test.max_score}</td>
               <td>{test.test_count}</td>
+              <td>{test.status}</td>
               <td>{formatTimeFromUnix(test.created_at * 1000)}</td>
             </tr>
           {/each}

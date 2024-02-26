@@ -27,15 +27,15 @@ func CreateTestGroup(problem_id string, user_id string, maxScore string, testCou
 	}
 	return id, nil
 }
-func UpdateTestResult(id string, max_memory string, time_taken string, output string, error string, correct bool) error {
-	_, err := DB.Exec("UPDATE tests_results SET max_memory=?, time_taken=?, output=?, error=?, correct=?, status=? WHERE id=?", max_memory, time_taken, output, error, correct, "finished", id)
+func UpdateTestResult(id string, max_memory string, time_taken string, output string, error string, correct bool, status string) error {
+	_, err := DB.Exec("UPDATE tests_results SET max_memory=?, time_taken=?, output=?, error=?, correct=?, status=? WHERE id=?", max_memory, time_taken, output, error, correct, status, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func CalculateTestGroupFinalScore(test_group_id string) error { //TO DO: optimize
+func CalculateTestGroupFinalScore(test_group_id string, status string) error { //TO DO: optimize
 	// go through all test results and tests score field and calculate final score
 	finalScore := 0
 	var maxScore int
@@ -65,7 +65,7 @@ func CalculateTestGroupFinalScore(test_group_id string) error { //TO DO: optimiz
 
 	}
 
-	_, err = DB.Exec("UPDATE tests_groups SET final_score=?, max_score=? WHERE id=?", finalScore, maxScore, test_group_id)
+	_, err = DB.Exec("UPDATE tests_groups SET final_score=?, max_score=?, status=? WHERE id=?", finalScore, maxScore, status, test_group_id)
 	if err != nil {
 		return err
 	}
@@ -75,8 +75,9 @@ func CalculateTestGroupFinalScore(test_group_id string) error { //TO DO: optimiz
 func CalculateTestGroupFinalScoreHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	testGroupId := vars["id"]
+	status := vars["status"]
 
-	err := CalculateTestGroupFinalScore(testGroupId)
+	err := CalculateTestGroupFinalScore(testGroupId, status)
 
 	if err != nil {
 		utils.RespondWithError(w, "Failed to calculate final score")
@@ -98,6 +99,7 @@ func UpdateTestResultHandler(w http.ResponseWriter, r *http.Request) { //TO DO: 
 		Output    string `json:"output"`
 		Error     string `json:"error"`
 		Correct   bool   `json:"correct"`
+		Status    string `json:"status"`
 	}
 
 	var body RequestBody
@@ -108,7 +110,7 @@ func UpdateTestResultHandler(w http.ResponseWriter, r *http.Request) { //TO DO: 
 		return
 	}
 
-	err = UpdateTestResult(testId, body.MaxMemory, body.TimeTaken, body.Output, body.Error, body.Correct)
+	err = UpdateTestResult(testId, body.MaxMemory, body.TimeTaken, body.Output, body.Error, body.Correct, body.Status)
 
 	if err != nil {
 		utils.RespondWithError(w, "Failed to update test result")
@@ -132,10 +134,11 @@ func GetSolveProgressHandler(w http.ResponseWriter, r *http.Request) {
 		ProblemID  string `json:"problem_id"`
 		TestCount  int    `json:"test_count"`
 		UserID     string `json:"user_id"`
+		Status     string `json:"status"`
 	}
 	var testGroup TestGroup
 
-	err := DB.QueryRow("SELECT max_score, final_score, problem_id, test_count, user_id FROM tests_groups WHERE id=?", test_group_id).Scan(&testGroup.MaxScore, &testGroup.FinalScore, &testGroup.ProblemID, &testGroup.TestCount, &testGroup.UserID)
+	err := DB.QueryRow("SELECT max_score, final_score, problem_id, test_count, user_id, status FROM tests_groups WHERE id=?", test_group_id).Scan(&testGroup.MaxScore, &testGroup.FinalScore, &testGroup.ProblemID, &testGroup.TestCount, &testGroup.UserID, &testGroup.Status)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.RespondWithError(w, "Test group not found")

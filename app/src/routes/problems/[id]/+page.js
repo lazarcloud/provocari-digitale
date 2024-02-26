@@ -10,6 +10,10 @@ export async function load({ params }) {
     const solves = await fetchAPIAuth(`/api/solve/${params.id}`)
     console.log("solves: ", solves)
     returnData.solves = solves.solves
+
+    const maxScore = await fetchAPIAuth(`/api/solve/max_score/${params.id}`)
+    console.log("maxScore: ", maxScore)
+    returnData.bestScore = maxScore.max_score
   }
 
   return returnData

@@ -174,12 +174,13 @@ func main() {
 
 	solveRouterPublic := r.PathPrefix("/api/solve").Subrouter()
 	solveRouterPublic.HandleFunc("/update/{id}", database.UpdateTestResultHandler).Methods("POST")
-	solveRouterPublic.HandleFunc("/calculate/{id}", database.CalculateTestGroupFinalScoreHandler).Methods("GET")
+	solveRouterPublic.HandleFunc("/calculate/{id}/{status}", database.CalculateTestGroupFinalScoreHandler).Methods("GET")
 
 	solveRouter := r.PathPrefix("/api/solve").Subrouter()
 	solveRouter.HandleFunc("/submit/{id}", database.SolveHandler).Methods("POST")
 	solveRouter.HandleFunc("/progress/{id}", database.GetSolveProgressHandler).Methods("GET") // TO DO: security for writing data and timestamps for test with status of created, to run, ran, finished and final score in test group
 	solveRouter.HandleFunc("/{id}", database.GetUserSolvesHandler).Methods("GET")
+	solveRouter.HandleFunc("/max_score/{id}", database.GetProblemMaxScoreHandler).Methods("GET")
 
 	solveRouter.Use(auth.JWTMiddleware)
 

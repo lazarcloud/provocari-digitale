@@ -55,7 +55,7 @@ func compareFiles(file1, file2 string) bool {
 	return string(content1) == string(content2)
 }
 
-func saveTestResult(testID string, result bool, memory int64, executionTime time.Duration) {
+func saveTestResult(testID string, result bool, memory int64, executionTime time.Duration, status string) {
 	api := "http://host.docker.internal:8080/api/solve/update/" + testID
 	type RequestBody struct {
 		MaxMemory string `json:"max_memory"`
@@ -63,6 +63,7 @@ func saveTestResult(testID string, result bool, memory int64, executionTime time
 		Output    string `json:"output"`
 		Error     string `json:"error"`
 		Correct   bool   `json:"correct"`
+		Status    string `json:"status"`
 	}
 	requestBody := RequestBody{
 		MaxMemory: strconv.FormatInt(memory, 10),
@@ -70,6 +71,7 @@ func saveTestResult(testID string, result bool, memory int64, executionTime time
 		Output:    "",
 		Error:     "",
 		Correct:   result,
+		Status:    status,
 	}
 
 	jsonData, err := json.Marshal(requestBody)
@@ -93,14 +95,15 @@ func saveTestResult(testID string, result bool, memory int64, executionTime time
 	fmt.Println(requestBody)
 }
 
-func calculateScores(test_group_id string) {
-	api := "http://host.docker.internal:8080/api/solve/calculate/" + test_group_id
+func calculateScores(test_group_id string, status string) {
+	api := "http://host.docker.internal:8080/api/solve/calculate/" + test_group_id + "/" + status
 	type RequestBody struct {
 		MaxMemory string `json:"max_memory"`
 		TimeTaken string `json:"time_taken"`
 		Output    string `json:"output"`
 		Error     string `json:"error"`
 		Correct   bool   `json:"correct"`
+		Status    string `json:"status"`
 	}
 
 	resp, err := http.Get(api)
