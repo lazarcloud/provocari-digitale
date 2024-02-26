@@ -52,16 +52,37 @@
 
 <div class="container">
   <h1>{pb.title}</h1>
-  <p>creată de <span>{pb.owner_email}</span></p>
-
-  <p>max_memory: {pb.max_memory}Kb și max_time: {pb.max_time}ms</p>
-  {#if pb.uses_standard_io}
-    <p>Se folosește standard input/output</p>
-  {:else}
-    <p>Se folosesc fișiere</p>
-    <p>IN: {pb.input_file_name} OUT: {pb.output_file_name}</p>
-  {/if}
-
+  <h2>Detaliile problemei</h2>
+  <table>
+    <!-- <tr>
+      <th>Autor</th>
+      <th>da</th>
+    </tr> -->
+    <tr>
+      <td>Autor</td>
+      <td>{pb.owner_email}</td>
+    </tr>
+    <tr>
+      <td>Memorie maximă</td>
+      <td>{pb.max_memory}Kb</td>
+    </tr>
+    <tr>
+      <td>Timp maxim</td>
+      <td>{pb.max_time}ms</td>
+    </tr>
+    {#if pb.uses_standard_io}
+      <tr>
+        <td>Citire / Scriere</td>
+        <td>Standard IO</td>
+      </tr>
+    {:else}
+      <tr>
+        <td>Citire / Scriere</td>
+        <td>IN: {pb.input_file_name} OUT: {pb.output_file_name}</td>
+      </tr>
+    {/if}
+  </table>
+  <h2>Cerință</h2>
   <p>{pb.description}</p>
 
   {#if $refresh != ""}
@@ -96,7 +117,7 @@
       <button on:click={prevPage}>Previous</button>
       <button on:click={nextPage}>Next</button>
     {/key}
-
+    <h2>Soluție</h2>
     <form
       on:submit|preventDefault={async () => {
         console.log(solution)
@@ -113,7 +134,6 @@
         solution = ""
       }}
     >
-      <label for="solution">Soluție:</label>
       <textarea
         id="solution"
         name="solution"
@@ -158,5 +178,15 @@
   h1 {
     font-size: clamp(2rem, 10vw, 4rem);
     text-align: center;
+  }
+  h2 {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    padding: 0;
   }
 </style>
