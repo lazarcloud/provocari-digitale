@@ -21,4 +21,9 @@
     font-style: normal;
     font-size: 1.1em;
   }
+  .container {
+    display: flex;
+    place-items: center;
+    height: 70vh;
+  }
 </style>

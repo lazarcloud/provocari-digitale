@@ -7,16 +7,20 @@
   let id = data.id
   let pb = data.pb
   let solution = ""
+  let currentPage = 1
+  let solvesPerPage = 5 // Number of solves to display per page
+
   function encodeToBase64(str) {
     return btoa(unescape(encodeURIComponent(str)))
   }
+
   function formatTimeFromUnix(unix) {
     const date = new Date(unix)
     return date.toLocaleString()
   }
-  let index = 0
-  // TO DO: optimize this
+
   let interval
+
   onMount(async () => {
     interval = setInterval(async () => {
       await invalidateAll()
@@ -24,12 +28,32 @@
 
     return () => clearInterval(interval)
   })
+
+  function nextPage() {
+    currentPage++
+  }
+
+  function prevPage() {
+    if (currentPage > 1) {
+      currentPage--
+    }
+  }
+
+  function getVisibleSolves() {
+    const startIndex = (currentPage - 1) * solvesPerPage
+    const endIndex = startIndex + solvesPerPage
+    return data.solves.slice(startIndex, endIndex)
+  }
+
+  function formatUUID4chars(uuid) {
+    return uuid.slice(0, 4)
+  }
 </script>
 
 <div class="container">
   <h1>{pb.title}</h1>
   <p>creată de <span>{pb.owner_email}</span></p>
-  <p>{pb.description}</p>
+
   <p>max_memory: {pb.max_memory}Kb și max_time: {pb.max_time}ms</p>
   {#if pb.uses_standard_io}
     <p>Se folosește standard input/output</p>
@@ -37,34 +61,40 @@
     <p>Se folosesc fișiere</p>
     <p>IN: {pb.input_file_name} OUT: {pb.output_file_name}</p>
   {/if}
-  <!-- {JSON.stringify(data)} -->
+
+  <p>{pb.description}</p>
+
   {#if $refresh != ""}
-    {#key index}
-      {#if data.solves.length}
-        <h2>
-          Rezolvările mele, maxim {data.bestScore} / {data.solves[0].max_score}
-        </h2>
-        <table>
+    {#key currentPage}
+      <h2>
+        Rezolvările mele, maxim {data.bestScore} / {data.solves[0].max_score}
+      </h2>
+      <table>
+        <tr>
+          <th>#</th>
+          <th>Scor Final</th>
+          <th>Scor Maxim</th>
+          <th>Nr. teste</th>
+          <th>Status</th>
+          <th>Data</th>
+        </tr>
+        {#each getVisibleSolves() as test, index}
           <tr>
-            <th>ID Test</th>
-            <th>Scor Final</th>
-            <th>Scor Maxim</th>
-            <th>Nr. teste</th>
-            <th>Status</th>
-            <th>Data</th>
+            <td
+              ><a href={`/solves/${test.id}`}
+                >{(currentPage - 1) * solvesPerPage + index + 1}</a
+              ></td
+            >
+            <td>{test.final_score == "NULL" ? "0" : test.final_score}</td>
+            <td>{test.max_score}</td>
+            <td>{test.test_count}</td>
+            <td><a href={`/solves/${test.id}`}>{test.status}</a></td>
+            <td>{formatTimeFromUnix(test.created_at * 1000)}</td>
           </tr>
-          {#each data.solves as test}
-            <tr>
-              <td><a href={`/solves/${test.id}`}>{test.id}</a></td>
-              <td>{test.final_score == "NULL" ? "0" : test.final_score}</td>
-              <td>{test.max_score}</td>
-              <td>{test.test_count}</td>
-              <td>{test.status}</td>
-              <td>{formatTimeFromUnix(test.created_at * 1000)}</td>
-            </tr>
-          {/each}
-        </table>
-      {:else}<h2>Nu ai rezolvat această problemă</h2>{/if}
+        {/each}
+      </table>
+      <button on:click={prevPage}>Previous</button>
+      <button on:click={nextPage}>Next</button>
     {/key}
 
     <form
@@ -81,7 +111,6 @@
         console.log(data)
         await invalidateAll()
         solution = ""
-        index++
       }}
     >
       <label for="solution">Soluție:</label>
@@ -109,6 +138,8 @@
   table {
     width: 100%;
     border-collapse: collapse;
+    max-height: 300px;
+    overflow-y: auto;
   }
   th,
   td {
@@ -123,5 +154,9 @@
     width: 100%;
     color: white;
     background-color: transparent;
+  }
+  h1 {
+    font-size: clamp(2rem, 10vw, 4rem);
+    text-align: center;
   }
 </style>

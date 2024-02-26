@@ -2,13 +2,14 @@
   import { page } from "$app/stores"
   import { refresh, userData } from "$lib"
 
-  let path = $page.url.pathname
-  $: path = $page.url.pathname
+  let url = $page.url.pathname
+  $: url = $page.url.pathname
   var right = 0
-  $: if (path) {
-    if (path == "/") right = 15.7
-    if (path == "/problems/") right = 10.5
-    if (path == "/login/") right = 3.25
+  $: if (url) {
+    right = 0
+    if (url == "/") right = 15.7
+    if (stringContains(url, "/problems/")) right = 10.5
+    if (url == "/login/" || url == "/register/") right = 3.25
   }
 
   let show = false
@@ -26,6 +27,10 @@
       behavior: "smooth",
       inline: "nearest",
     })
+  }
+
+  function stringContains(string = "", substring = "") {
+    return string.includes(substring)
   }
 </script>
 
@@ -55,20 +60,20 @@
   <div class="content {show ? 'show' : ''}">
     <a
       href="/"
-      class={path == "/" ? "active" : ""}
+      class={url == "/" ? "active" : ""}
       on:click={() => (show = false)}
       >Acasă
     </a>
     <a
       href="/problems"
-      class={path == "/problems/" ? "active" : ""}
+      class={stringContains(url, "/problems/") ? "active" : ""}
       on:click={() => (show = false)}
       >Probleme
     </a>
     {#if $refresh != ""}
       <a
         href="#logout"
-        class={path == "/logout/" ? "active" : ""}
+        class={url == "/logout/" ? "active" : ""}
         on:click={() => {
           show = false
           refresh.set("")
@@ -79,7 +84,7 @@
     {:else}
       <a
         href="/login"
-        class={path == "/login/" ? "active" : ""}
+        class={url == "/login/" || url == "/register/" ? "active" : ""}
         on:click={() => (show = false)}
         >Loghează-te
       </a>
