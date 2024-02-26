@@ -1,6 +1,7 @@
 <script>
   import { fetchAPIAuth, refresh } from "$lib"
   import { invalidateAll } from "$app/navigation"
+  import { onMount } from "svelte"
 
   export let data
   let id = data.id
@@ -14,6 +15,15 @@
     return date.toLocaleString()
   }
   let index = 0
+  // TO DO: optimize this
+  let interval
+  onMount(async () => {
+    interval = setInterval(async () => {
+      await invalidateAll()
+    }, 5000)
+
+    return () => clearInterval(interval)
+  })
 </script>
 
 <div class="container">
@@ -27,36 +37,30 @@
     <p>Se folosesc fișiere</p>
     <p>IN: {pb.input_file_name} OUT: {pb.output_file_name}</p>
   {/if}
-
+  <!-- {JSON.stringify(data)} -->
   {#if $refresh != ""}
     {#key index}
-      {#await fetchAPIAuth(`/api/solve/${id}`)}
-        <p>loading...</p>
-      {:then solves}
-        {#if solves.solves.length}
-          <h2>Rezolvările mele</h2>
-          <table>
+      {#if data.solves.length}
+        <h2>Rezolvările mele</h2>
+        <table>
+          <tr>
+            <th>ID Test</th>
+            <th>Scor Final</th>
+            <th>Scor Maxim</th>
+            <th>Nr. teste</th>
+            <th>Data</th>
+          </tr>
+          {#each data.solves as test}
             <tr>
-              <th>ID Test</th>
-              <th>Scor Final</th>
-              <th>Scor Maxim</th>
-              <th>Nr. teste</th>
-              <th>Data</th>
+              <td><a href={`/solves/${test.id}`}>{test.id}</a></td>
+              <td>{test.final_score == "NULL" ? "0" : test.final_score}</td>
+              <td>{test.max_score}</td>
+              <td>{test.test_count}</td>
+              <td>{formatTimeFromUnix(test.created_at * 1000)}</td>
             </tr>
-            {#each solves.solves as test}
-              <tr>
-                <td><a href={`/solves/${test.id}`}>{test.id}</a></td>
-                <td>{test.final_score == "NULL" ? "0" : test.final_score}</td>
-                <td>{test.max_score}</td>
-                <td>{test.test_count}</td>
-                <td>{formatTimeFromUnix(test.created_at * 1000)}</td>
-              </tr>
-            {/each}
-          </table>
-        {:else}<h2>Nu ai rezolvat această problemă</h2>{/if}
-      {:catch error}
-        <p>{error.message}</p>
-      {/await}
+          {/each}
+        </table>
+      {:else}<h2>Nu ai rezolvat această problemă</h2>{/if}
     {/key}
 
     <form

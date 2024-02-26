@@ -73,6 +73,10 @@ func Connect() {
 			FOREIGN KEY(user_id) REFERENCES users(id),
 			FOREIGN KEY(problem_id) REFERENCES problems(id)
 		)`)
+		createTable(`CREATE TABLE IF NOT EXISTS spam (
+			user_id BLOB PRIMARY KEY NOT NULL,
+			last_spam INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INT))
+		)`)
 		// createTable(`CREATE TABLE IF NOT EXISTS solve_sources (
 		// 	id BLOB PRIMARY KEY NOT NULL,
 		// 	problem_id BLOB NOT NULL,
@@ -126,6 +130,7 @@ func Populate() {
 		{"2", "512", "2", "Test problem 2", "2 pb", true, "NULL"},
 		{"3", "1024", "3", "Test problem 3", "3 pb", true, "NULL"},
 		{"1234", "1024", "3", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
+		{"1235", "1024", "3", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
 	}
 
 	for _, problem := range problems {
@@ -151,6 +156,8 @@ func Populate() {
 		{"1234", "8 9", "17", 1},
 		{"1234", "21 4", "25", 1},
 		{"1234", "5 5", "10", 1},
+		{"1235", "1 2", "3", 1},
+		{"1235", "5 4", "9", 1},
 	}
 	for _, test := range tests {
 		_, err := DB.Exec("INSERT INTO tests (id, problem_id, input, output, score) VALUES (?, ?, ?, ?, ?)", GenerateUUID(), test.problemID, test.input, test.output, test.score)
