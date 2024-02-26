@@ -37,7 +37,22 @@
 </script>
 
 <div class="container">
-  <h1>Problem {id}</h1>
+  <h1>Soluție {id}</h1>
+  <h2>Detaliile soluției</h2>
+  <table>
+    <tr>
+      <td>Scor</td>
+      <td
+        >{group.final_score == "NULL"
+          ? "0"
+          : group.final_score}/{group.max_score}</td
+      >
+    </tr>
+    <tr>
+      <td>Memorie maximă</td>
+      <td>Kb</td>
+    </tr>
+  </table>
   <p>
     Scor {group.final_score == "NULL"
       ? "0"
@@ -65,6 +80,8 @@
   table {
     width: 100%;
     border-collapse: collapse;
+    max-height: 300px;
+    overflow-y: auto;
   }
   th,
   td {
@@ -74,5 +91,24 @@
   }
   span {
     opacity: 0.6;
+  }
+  textarea {
+    width: 100%;
+    color: white;
+    background-color: transparent;
+  }
+  h1 {
+    font-size: clamp(2rem, 10vw, 4rem);
+    text-align: center;
+  }
+  h2 {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    padding: 0;
   }
 </style>

@@ -50,4 +50,9 @@ a {
   text-decoration: none;
   color: var(--text);
   opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+a:hover {
+  opacity: 1;
 }
