@@ -46,11 +46,12 @@
   <p>ID Problemă: {group.problem_id}</p>
   <p>Număr teste: {group.test_count}</p>
   <p>Status: {group.status || "finished"}</p>
+  <p>{group.source}</p>
   {#each pb.results as result, index}
     <div>
       <h2>Test {index}: {getRomanian(result.status, translations)}</h2>
       <p>{result.correct ? "Corect" : "Greșit"}</p>
-      <p>Memorie necesară: {result.max_memory}</p>
+      <p>Memorie necesară: {result.max_memory}Kb</p>
       <p>Timp necesar: {result.time_taken}</p>
     </div>
   {/each}

@@ -13,7 +13,14 @@ import (
 func convertToBase64(content string) string {
 	return base64.StdEncoding.EncodeToString([]byte(content))
 }
-
+func parseInt(s string) int64 {
+	var i int64
+	_, err := fmt.Sscanf(s, "%d", &i)
+	if err != nil {
+		return 0
+	}
+	return i
+}
 func CreateTestContainer(problemID string, solution string, usedId string) (bool, string, error) {
 
 	fmt.Println("Creating Docker container...")
@@ -71,7 +78,7 @@ func CreateTestContainer(problemID string, solution string, usedId string) (bool
 		return false, "", err
 	}
 
-	testGroupId, err := CreateTestGroup(problemID, usedId, fmt.Sprintf("%d", maxScore), testCount)
+	testGroupId, err := CreateTestGroup(problemID, usedId, fmt.Sprintf("%d", maxScore), testCount, solution)
 	if err != nil {
 		return false, "", err
 	}
@@ -86,6 +93,10 @@ func CreateTestContainer(problemID string, solution string, usedId string) (bool
 		environmentVariables[fmt.Sprintf("TEST_%d_ID", i)] = test_id
 	}
 
+	// max memory and max time
+	environmentVariables["MAX_MEMORY"] = problemData.MaxMemory
+	environmentVariables["MAX_TIME"] = problemData.MaxTime
+
 	var envList []string
 	for key, value := range environmentVariables {
 		envList = append(envList, fmt.Sprintf("%s=%s", key, value))
@@ -98,12 +109,12 @@ func CreateTestContainer(problemID string, solution string, usedId string) (bool
 	}
 
 	hostConfig := &container.HostConfig{
-		// AutoRemove:  true,
+		AutoRemove:  true,
 		NetworkMode: "host",
-		Resources:   container.Resources{
-			// Memory: 64 * 1024 * 1024, // 256MB
+		Resources: container.Resources{
+			Memory: parseInt(problemData.MaxMemory) * 1024, // 256MB
 			// CPUPeriod: 100000,1
-			// CPUQuota:  10000, // 10ms (10% of a single CPU core)
+			CPUQuota: 10000, // 10ms (10% of a single CPU core)
 		},
 	}
 

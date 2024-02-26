@@ -19,9 +19,9 @@ func CreateTestResult(test_id string, test_group_id string) (string, error) {
 	return id, nil
 }
 
-func CreateTestGroup(problem_id string, user_id string, maxScore string, testCount int) (string, error) {
+func CreateTestGroup(problem_id string, user_id string, maxScore string, testCount int, source string) (string, error) {
 	id := GenerateUUID()
-	_, err := DB.Exec("INSERT INTO tests_groups (id, problem_id, user_id, max_score, test_count) VALUES (?, ?, ?, ?, ?)", id, problem_id, user_id, maxScore, testCount)
+	_, err := DB.Exec("INSERT INTO tests_groups (id, problem_id, user_id, max_score, test_count, source) VALUES (?, ?, ?, ?, ?, ?)", id, problem_id, user_id, maxScore, testCount, source)
 	if err != nil {
 		return "", err
 	}
@@ -135,10 +135,11 @@ func GetSolveProgressHandler(w http.ResponseWriter, r *http.Request) {
 		TestCount  int    `json:"test_count"`
 		UserID     string `json:"user_id"`
 		Status     string `json:"status"`
+		Source     string `json:"source"`
 	}
 	var testGroup TestGroup
 
-	err := DB.QueryRow("SELECT max_score, final_score, problem_id, test_count, user_id, status FROM tests_groups WHERE id=?", test_group_id).Scan(&testGroup.MaxScore, &testGroup.FinalScore, &testGroup.ProblemID, &testGroup.TestCount, &testGroup.UserID, &testGroup.Status)
+	err := DB.QueryRow("SELECT max_score, final_score, problem_id, test_count, user_id, status, source FROM tests_groups WHERE id=?", test_group_id).Scan(&testGroup.MaxScore, &testGroup.FinalScore, &testGroup.ProblemID, &testGroup.TestCount, &testGroup.UserID, &testGroup.Status, &testGroup.Source)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.RespondWithError(w, "Test group not found")

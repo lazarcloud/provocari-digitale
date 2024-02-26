@@ -120,3 +120,12 @@ func calculateScores(test_group_id string, status string) {
 
 	fmt.Println("Updated scores")
 }
+
+func parseInt64(s string) int64 {
+	var i int64
+	_, err := fmt.Sscanf(s, "%d", &i)
+	if err != nil {
+		return 0
+	}
+	return i
+}

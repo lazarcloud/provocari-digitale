@@ -71,6 +71,7 @@ func Connect() {
 			max_score TEXT DEFAULT 'NULL',
 			test_count INTEGER DEFAULT 0,
 			status TEXT DEFAULT 'waiting',
+			source BLOB NOT NULL,
 			FOREIGN KEY(user_id) REFERENCES users(id),
 			FOREIGN KEY(problem_id) REFERENCES problems(id)
 		)`)
@@ -130,7 +131,7 @@ func Populate() {
 		{"1", "256", "1", "Test problem 1", "1 pb", true, "NULL"},
 		{"2", "512", "2", "Test problem 2", "2 pb", true, "NULL"},
 		{"3", "1024", "3", "Test problem 3", "3 pb", true, "NULL"},
-		{"1234", "1024", "3", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
+		{"1234", "400000", "1000", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
 		{"1235", "1024", "3", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
 	}
 

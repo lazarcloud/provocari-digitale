@@ -7,6 +7,15 @@ import (
 
 var validTestingModes = []string{"individualFiles"}
 
+func paseTimeDuration(s string) time.Duration {
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		finishExecution(fmt.Errorf("Error parsing time duration"))
+	}
+	return d
+
+}
+
 func main() {
 	// Get problem details
 
@@ -15,6 +24,8 @@ func main() {
 	problemInputFile := getEnv("PROBLEM_INPUT_FILE")
 	problemOutputFile := getEnv("PROBLEM_OUTPUT_FILE")
 	numberOfTestCases := parseInt(getEnv("NUMBER_OF_TEST_CASES"))
+	maxMemory := parseInt64(getEnv("MAX_MEMORY"))
+	maxTime := paseTimeDuration(getEnv("MAX_TIME") + "ms")
 	// print the problem details
 	fmt.Println("Testing mode:", testingMode)
 	fmt.Println("Problem input file:", problemInputFile)
@@ -57,7 +68,7 @@ func main() {
 			writeFile("console.in", input)
 
 			// Run the code
-			err, memory, executionTime := runCPP("/executable", "console.in", "console.out")
+			err, memory, executionTime := runCPP("/executable", "console.in", "console.out", maxTime, maxMemory)
 			if err != nil {
 				fmt.Println("Error running executable")
 				fmt.Println(err)
@@ -72,17 +83,21 @@ func main() {
 			writeFile("consoleRight.out", output)
 
 			// Compare the output
-			correct := compareFiles("console.out", "consoleRight.out")
-			if correct {
+			correctFile := compareFiles("console.out", "consoleRight.out")
+			correctMemory := memory <= maxMemory
+			correctTime := executionTime <= maxTime
+			if correctFile && correctMemory && correctTime {
 				fmt.Println("Test case", i, "passed")
+				saveTestResult(test_id, true, memory, executionTime, "finished")
 			} else {
 				fmt.Println("Test case", i, "failed")
+				saveTestResult(test_id, false, memory, executionTime, "finished")
 			}
 
 			fmt.Println("--------------------------------------------------")
 
 			// Save the test result
-			saveTestResult(test_id, correct, memory, executionTime, "finished")
+
 			calculateScores(test_group_id, "running")
 
 		}

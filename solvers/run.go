@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -8,8 +9,12 @@ import (
 	"time"
 )
 
-func runCPP(executableFile string, inputFile string, outputFile string) (err error, memory int64, executionTime time.Duration) {
-	cmd := exec.Command(executableFile)
+func runCPP(executableFile string, inputFile string, outputFile string, maxTime time.Duration, memoryLimit int64) (err error, memory int64, executionTime time.Duration) {
+	// Create a context with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), maxTime)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, executableFile)
 
 	// Open the input file
 	infile, err := os.Open(inputFile)
@@ -42,27 +47,37 @@ func runCPP(executableFile string, inputFile string, outputFile string) (err err
 	pid := cmd.Process.Pid
 	fmt.Println("Executable running with PID:", pid)
 
-	// Wait for the executable to finish
-	err = cmd.Wait()
-	executionTime = time.Since(startTime) // Calculate the execution time
-	if err != nil {
-		return err, 0, 0
-	}
-	fmt.Println("Executable finished successfully in", executionTime)
+	// Channel to communicate if execution is completed
+	done := make(chan error)
+	go func() {
+		done <- cmd.Wait()
+	}()
 
-	// This is platform specific and may vary depending on the OS
-	// Here we use the syscall package to get the resource usage of the process
-	// See https://pkg.go.dev/syscall#Rusage for details
+	select {
+	case <-ctx.Done():
+		// Timeout reached
+		if err := cmd.Process.Kill(); err != nil {
+			fmt.Println("Error killing process:", err)
+		}
+		fmt.Println("Execution timed out")
+		return ctx.Err(), 0, time.Since(startTime)
+	case err := <-done:
+		// Execution completed
+		if err != nil {
+			return err, 0, 0
+		}
+		fmt.Println("Executable finished successfully")
+		executionTime = time.Since(startTime)
+	}
+
+	// Get memory usage
 	var rusage syscall.Rusage
 	err = syscall.Getrusage(syscall.RUSAGE_CHILDREN, &rusage)
 	if err != nil {
 		fmt.Println("Error getting resource usage")
-		fmt.Println(err)
-		return
+		return err, 0, executionTime
 	}
 	// The Maxrss field is the maximum resident set size in kilobytes
-	// This is the amount of memory occupied by the process in RAM
-	// See https://man7.org/linux/man-pages/man2/getrusage.2.html for details
 	memUsage := rusage.Maxrss
 	return nil, memUsage, executionTime
 }

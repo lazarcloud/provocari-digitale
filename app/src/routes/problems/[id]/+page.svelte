@@ -30,7 +30,7 @@
   <h1>{pb.title}</h1>
   <p>creată de <span>{pb.owner_email}</span></p>
   <p>{pb.description}</p>
-  <p>max_memory: {pb.max_memory}Mb și max_time: {pb.max_time}s</p>
+  <p>max_memory: {pb.max_memory}Kb și max_time: {pb.max_time}ms</p>
   {#if pb.uses_standard_io}
     <p>Se folosește standard input/output</p>
   {:else}
