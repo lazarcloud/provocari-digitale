@@ -41,6 +41,10 @@
   <h2>Detaliile soluției</h2>
   <table>
     <tr>
+      <td>ID problemă</td>
+      <td>{group.problem_id}</td>
+    </tr>
+    <tr>
       <td>Scor</td>
       <td
         >{group.final_score == "NULL"
@@ -49,27 +53,39 @@
       >
     </tr>
     <tr>
-      <td>Memorie maximă</td>
-      <td>Kb</td>
+      <td>Număr teste</td>
+      <td>{group.test_count}</td>
+    </tr>
+    <tr>
+      <td>Status</td>
+      <td>{getRomanian(group.status, translations) || "Anulat"}</td>
     </tr>
   </table>
-  <p>
-    Scor {group.final_score == "NULL"
-      ? "0"
-      : group.final_score}/{group.max_score}
-  </p>
-  <p>ID Problemă: {group.problem_id}</p>
-  <p>Număr teste: {group.test_count}</p>
-  <p>Status: {group.status || "finished"}</p>
+  <h2>Codul sursă</h2>
   <p>{group.source}</p>
-  {#each pb.results as result, index}
-    <div>
-      <h2>Test {index}: {getRomanian(result.status, translations)}</h2>
-      <p>{result.correct ? "Corect" : "Greșit"}</p>
-      <p>Memorie necesară: {result.max_memory}Kb</p>
-      <p>Timp necesar: {result.time_taken}</p>
-    </div>
-  {/each}
+  <h2>Rezultatele testelor</h2>
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Status</th>
+      <th>Verdict</th>
+      <th>Memorie necesară</th>
+      <th>Timp necesar</th>
+    </tr>
+    {#each pb.results as result, index}
+      <tr>
+        <td>{index}</td>
+        <td>{getRomanian(result.status, translations)}</td>
+        {#if "Așteptare" == getRomanian(result.status, translations)}
+          <td>Așteptare</td>
+        {:else}
+          <td>{result.correct ? "Corect" : "Greșit"}</td>
+        {/if}
+        <td>{result.max_memory}{result.max_memory != "" ? "Kb" : ""}</td>
+        <td>{result.time_taken}</td>
+      </tr>
+    {/each}
+  </table>
 </div>
 
 <style>
