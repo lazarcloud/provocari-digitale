@@ -114,7 +114,7 @@ func CreateTestContainer(problemID string, solution string, usedId string) (bool
 		Resources: container.Resources{
 			Memory: parseInt(problemData.MaxMemory) * 1024, // 256MB
 			// CPUPeriod: 100000,1
-			CPUQuota: 10000, // 10ms (10% of a single CPU core)
+			CPUQuota: 10000, // 10ms (10% of a single CPU core) //laptop 10000
 		},
 	}
 

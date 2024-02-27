@@ -21,10 +21,10 @@
 
   let interval
 
-  onMount(async () => {
+  onMount(() => {
     interval = setInterval(async () => {
       await invalidateAll()
-    }, 5000)
+    }, 1000)
 
     return () => clearInterval(interval)
   })
@@ -47,6 +47,21 @@
 
   function formatUUID4chars(uuid) {
     return uuid.slice(0, 4)
+  }
+
+  let translations = {
+    NULL: "Așteptare",
+    waiting: "Așteptare",
+    running: "Rulare",
+    finished: "Terminat",
+    compiling: "Compilare",
+  }
+
+  function getRomanian(message = "", translations = {}) {
+    if (translations.hasOwnProperty(message)) {
+      return translations[message]
+    }
+    return message
   }
 </script>
 
@@ -86,37 +101,45 @@
   <p>{pb.description}</p>
 
   {#if $refresh != ""}
-    {#key currentPage}
-      <h2>
-        Rezolvările mele, maxim {data.bestScore} / {data.solves[0].max_score}
-      </h2>
-      <table>
-        <tr>
-          <th>#</th>
-          <th>Scor Final</th>
-          <th>Scor Maxim</th>
-          <th>Nr. teste</th>
-          <th>Status</th>
-          <th>Data</th>
-        </tr>
-        {#each getVisibleSolves() as test, index}
+    {#if data.solves.length}
+      {#key currentPage && data.solves.length}
+        <h2>
+          Rezolvările mele, maxim {data.bestScore} / {data.solves[0].max_score}
+        </h2>
+        <table>
           <tr>
-            <td
-              ><a href={`/solves/${test.id}`}
-                >{(currentPage - 1) * solvesPerPage + index + 1}</a
-              ></td
-            >
-            <td>{test.final_score == "NULL" ? "0" : test.final_score}</td>
-            <td>{test.max_score}</td>
-            <td>{test.test_count}</td>
-            <td><a href={`/solves/${test.id}`}>{test.status}</a></td>
-            <td>{formatTimeFromUnix(test.created_at * 1000)}</td>
+            <th>#</th>
+            <th>Scor Final</th>
+            <th>Scor Maxim</th>
+            <th>Nr. teste</th>
+            <th>Status</th>
+            <th>Data</th>
           </tr>
-        {/each}
-      </table>
-      <button on:click={prevPage}>Previous</button>
-      <button on:click={nextPage}>Next</button>
-    {/key}
+          {#each getVisibleSolves() as test, index}
+            <tr>
+              <td
+                ><a href={`/solves/${test.id}`}
+                  >{(currentPage - 1) * solvesPerPage + index + 1}</a
+                ></td
+              >
+              <td>{test.final_score == "NULL" ? "0" : test.final_score}</td>
+              <td>{test.max_score}</td>
+              <td>{test.test_count}</td>
+              <td
+                ><a href={`/solves/${test.id}`}
+                  >{getRomanian(test.status, translations)}</a
+                ></td
+              >
+              <td>{formatTimeFromUnix(test.created_at * 1000)}</td>
+            </tr>
+          {/each}
+        </table>
+        <button on:click={prevPage}>Previous</button>
+        <button on:click={nextPage}>Next</button>
+      {/key}
+    {:else}
+      <h2>Nu ai rezolvări pentru această problemă</h2>
+    {/if}
     <h2>Soluție</h2>
     <form
       on:submit|preventDefault={async () => {

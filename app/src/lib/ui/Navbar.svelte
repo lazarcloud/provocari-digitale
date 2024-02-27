@@ -73,7 +73,7 @@
     {#if $refresh != ""}
       <a
         href="#logout"
-        class={url == "/logout/" ? "active" : ""}
+        class={url == "/login/" || url == "/register/" ? "active" : ""}
         on:click={() => {
           show = false
           refresh.set("")
