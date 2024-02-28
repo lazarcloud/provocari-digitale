@@ -7,27 +7,14 @@
   var right = 0
   $: if (url) {
     right = 0
-    if (url == "/") right = 15.7
-    if (stringContains(url, "/problems/")) right = 10.5
+    if (url == "/") right = 25
+    if (stringContains(url, "/problems/")) right = 19.4
     if (url == "/login/" || url == "/register/") right = 3.25
+    if (url == "/help/") right = 14.2
+    if (url == "/about/") right = 9.35
   }
 
   let show = false
-
-  function gotoElement(id = "") {
-    show = false
-
-    if (id == "") return console.error("No id provided")
-    const element = document.getElementById(id)
-
-    if (!element) return console.error("Element not found")
-
-    element.scrollIntoView({
-      block: "start",
-      behavior: "smooth",
-      inline: "nearest",
-    })
-  }
 
   function stringContains(string = "", substring = "") {
     return string.includes(substring)
@@ -37,8 +24,6 @@
 <nav>
   <div>
     <a style="opacity:1;" href="/"><img src="/logo.png" alt="logo" /></a>
-    <!-- <div class="line"></div>
-      <a href="/"><img src="/logo.png" alt="logo" /></a> -->
   </div>
 
   <div class="burger">
@@ -70,6 +55,18 @@
       on:click={() => (show = false)}
       >Probleme
     </a>
+    <a
+      href="/help"
+      class={url == "/help/" ? "active" : ""}
+      on:click={() => (show = false)}
+      >Ajutor
+    </a>
+    <a
+      href="/about"
+      class={url == "/about/" ? "active" : ""}
+      on:click={() => (show = false)}
+      >Despre
+    </a>
     {#if $refresh != ""}
       <a
         href="#logout"
@@ -97,12 +94,6 @@
   img {
     height: 32px;
     width: auto;
-  }
-  .line {
-    width: 1px;
-    height: 16px;
-    background-color: var(--white);
-    margin: 0 1rem;
   }
   nav {
     display: flex;

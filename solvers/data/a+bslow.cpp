@@ -1,5 +1,4 @@
 #include <iostream>
-#include <numeric>  // Include the <numeric> header for std::accumulate
 #include <vector>
 int A[100000000];
 int main() {
