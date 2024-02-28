@@ -64,28 +64,30 @@
   <h2>Codul sursă</h2>
   <p>{group.source}</p>
   <h2>Rezultatele testelor</h2>
-  <table>
-    <tr>
-      <th>#</th>
-      <th>Status</th>
-      <th>Verdict</th>
-      <th>Memorie necesară</th>
-      <th>Timp necesar</th>
-    </tr>
-    {#each pb.results as result, index}
+  <div class="tableWrapper">
+    <table>
       <tr>
-        <td>{index}</td>
-        <td>{getRomanian(result.status, translations)}</td>
-        {#if "Așteptare" == getRomanian(result.status, translations)}
-          <td>Așteptare</td>
-        {:else}
-          <td>{result.correct ? "Corect" : "Greșit"}</td>
-        {/if}
-        <td>{result.max_memory}{result.max_memory != "" ? "Kb" : ""}</td>
-        <td>{result.time_taken}</td>
+        <th>#</th>
+        <th>Status</th>
+        <th>Verdict</th>
+        <th>Memorie necesară</th>
+        <th>Timp necesar</th>
       </tr>
-    {/each}
-  </table>
+      {#each pb.results as result, index}
+        <tr>
+          <td>{index}</td>
+          <td>{getRomanian(result.status, translations)}</td>
+          {#if "Așteptare" == getRomanian(result.status, translations)}
+            <td>Așteptare</td>
+          {:else}
+            <td>{result.correct ? "Corect" : "Greșit"}</td>
+          {/if}
+          <td>{result.max_memory}{result.max_memory != "" ? "Kb" : ""}</td>
+          <td>{result.time_taken}</td>
+        </tr>
+      {/each}
+    </table>
+  </div>
 </div>
 
 <style>
@@ -126,5 +128,8 @@
     gap: 1rem;
     width: 100%;
     padding: 0;
+  }
+  .tableWrapper {
+    overflow-x: auto;
   }
 </style>

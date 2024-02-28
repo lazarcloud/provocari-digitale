@@ -30,7 +30,7 @@
   })
 
   function nextPage() {
-    currentPage++
+    if (currentPage * solvesPerPage < data.solves.length) currentPage++
   }
 
   function prevPage() {
@@ -106,34 +106,36 @@
         <h2>
           Rezolvările mele, maxim {data.bestScore} / {data.solves[0].max_score}
         </h2>
-        <table>
-          <tr>
-            <th>#</th>
-            <th>Scor Final</th>
-            <th>Scor Maxim</th>
-            <th>Nr. teste</th>
-            <th>Status</th>
-            <th>Data</th>
-          </tr>
-          {#each getVisibleSolves() as test, index}
+        <div class="tableWrapper">
+          <table>
             <tr>
-              <td
-                ><a href={`/solves/${test.id}`}
-                  >{(currentPage - 1) * solvesPerPage + index + 1}</a
-                ></td
-              >
-              <td>{test.final_score == "NULL" ? "0" : test.final_score}</td>
-              <td>{test.max_score}</td>
-              <td>{test.test_count}</td>
-              <td
-                ><a href={`/solves/${test.id}`}
-                  >{getRomanian(test.status, translations)}</a
-                ></td
-              >
-              <td>{formatTimeFromUnix(test.created_at * 1000)}</td>
+              <th>#</th>
+              <th>Scor Final</th>
+              <th>Scor Maxim</th>
+              <th>Nr. teste</th>
+              <th>Status</th>
+              <th>Data</th>
             </tr>
-          {/each}
-        </table>
+            {#each getVisibleSolves() as test, index}
+              <tr>
+                <td
+                  ><a href={`/solves/${test.id}`}
+                    >{(currentPage - 1) * solvesPerPage + index + 1}</a
+                  ></td
+                >
+                <td>{test.final_score == "NULL" ? "0" : test.final_score}</td>
+                <td>{test.max_score}</td>
+                <td>{test.test_count}</td>
+                <td
+                  ><a href={`/solves/${test.id}`}
+                    >{getRomanian(test.status, translations)}</a
+                  ></td
+                >
+                <td>{formatTimeFromUnix(test.created_at * 1000)}</td>
+              </tr>
+            {/each}
+          </table>
+        </div>
         <button on:click={prevPage}>Previous</button>
         <button on:click={nextPage}>Next</button>
       {/key}
@@ -211,5 +213,8 @@
     gap: 1rem;
     width: 100%;
     padding: 0;
+  }
+  .tableWrapper {
+    overflow-x: auto;
   }
 </style>
