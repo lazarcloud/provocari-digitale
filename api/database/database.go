@@ -113,11 +113,9 @@ func Populate() {
 		uses_standard_io bool
 		test_mode        string
 	}{
-		{"1", "256", "1", "Test problem 1", "1 pb", true, "NULL"},
-		{"2", "512", "2", "Test problem 2", "2 pb", true, "NULL"},
-		{"3", "1024", "3", "Test problem 3", "3 pb", true, "NULL"},
-		{"1234", "400000", "1000", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
-		{"1235", "1024", "3", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
+		{"1234", "100000", "300", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
+		{"132", "400000", "1000", "Citește două numere întregi din cin și afișează cmmdc al lor în cout. Daca sunt prime intre ele afisează 0.", "CMMDC", true, "individualFiles"},
+		{"1327", "650000", "1200", "Gigel, intr-o zi cand isi facea temele la matematica, s-a apucat sa scrie pe o foaie de hartie, un sir de fractii ireductibile de forma P/Q cu 1 ≤ P,Q ≤ N, unde N este un numar natural ales de el. De exemplu, pentru N = 4 el a obtinut urmatorul sir: <br> 1/1 1/2 1/3 1/4 2/1 2/3 3/1 3/2 3/4 4/1 4/3 <br> Gigel s-a apucat apoi sa numere cate fractii a obtinut pentru N = 4 si a vazut ca sunt 11. <br>Fiind dat un numar natural N in cin, sa se determine cate fractii sunt in sirul de fractii construit dupa regulile de mai sus si sa se afiseze in count.		", "Fractii", true, "individualFiles"},
 	}
 
 	for _, problem := range problems {
@@ -133,18 +131,28 @@ func Populate() {
 		output    string
 		score     int
 	}{
-		{"1234", "1 2", "3", 1},
+		{"1234", "1 2", "3", 1}, //A+B
 		{"1234", "5 4", "9", 1},
 		{"1234", "1 5", "6", 1},
 		{"1234", "4 7", "11", 1},
 		{"1234", "3 7", "10", 1},
-		{"1234", "1 9", "10", 1},
-		{"1234", "5 8", "13", 1},
-		{"1234", "8 9", "17", 1},
-		{"1234", "21 4", "25", 1},
-		{"1234", "5 5", "10", 1},
-		{"1235", "1 2", "3", 1},
-		{"1235", "5 4", "9", 1},
+		{"1234", "1 9", "10", 2},
+		{"1234", "5 8", "13", 2},
+		{"1234", "8 9", "17", 2},
+		{"1234", "21 4", "25", 2},
+		{"1234", "5 5", "10", 3},
+		{"132", "5 5", "5", 1}, //cmmdc
+		{"132", "5 6", "0", 1},
+		{"132", "5 15", "5", 1},
+		{"132", "5 10", "5", 1},
+		{"132", "5 7", "0", 2},
+		{"132", "5 8", "0", 2},
+		{"132", "5 9", "0", 2},
+		{"132", "5 11", "0", 2},
+		{"1327", "3", "7", 2}, //fractii
+		{"1327", "4", "11", 2},
+		{"1327", "5", "19", 3},
+		{"1327", "10", "63", 3},
 	}
 	for _, test := range tests {
 		_, err := DB.Exec("INSERT INTO tests (id, problem_id, input, output, score) VALUES (?, ?, ?, ?, ?)", GenerateUUID(), test.problemID, test.input, test.output, test.score)

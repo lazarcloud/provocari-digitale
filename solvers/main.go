@@ -68,6 +68,7 @@ func main() {
 			writeFile("console.in", input)
 
 			// Run the code
+			time.Sleep(1 * time.Second)
 			err, memory, executionTime := runCPP("/executable", "console.in", "console.out", maxTime, maxMemory)
 			if err != nil {
 				fmt.Println("Error running executable")

@@ -98,7 +98,7 @@
     {/if}
   </table>
   <h2>Cerință</h2>
-  <p>{pb.description}</p>
+  <p>{@html pb.description}</p>
 
   {#if $refresh != ""}
     {#if data.solves.length}

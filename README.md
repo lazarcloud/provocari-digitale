@@ -11,7 +11,7 @@ Pentru rulare sunt necesare:
 * Compilator de C pentru dependențe
 
 ```sh
-docker build -t cpp-executor -f .\CPPDockerfile .
+cd solvers && docker build -t cpp-executor -f .\CPPDockerfile .
 ```
 consturieste imaginea compilatorului C++ pe docker
 ```sh
