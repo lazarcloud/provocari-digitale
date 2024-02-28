@@ -12,7 +12,7 @@ import (
 	"github.com/lazarcloud/provocari-digitale/api/auth"
 	"github.com/lazarcloud/provocari-digitale/api/globals"
 	"github.com/lazarcloud/provocari-digitale/api/utils"
-	_ "github.com/mattn/go-sqlite3" // Import sqlite3 driver
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // ErrorResponse represents an error response.

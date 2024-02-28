@@ -79,21 +79,6 @@ func Connect() {
 			user_id BLOB PRIMARY KEY NOT NULL,
 			last_spam INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INT))
 		)`)
-		// createTable(`CREATE TABLE IF NOT EXISTS solve_sources (
-		// 	id BLOB PRIMARY KEY NOT NULL,
-		// 	problem_id BLOB NOT NULL,
-		// 	file BLOB NOT NULL
-		// )`)
-		// createTable(`CREATE TABLE IF NOT EXISTS solve_compiled_sources (
-		// 	id BLOB PRIMARY KEY NOT NULL,
-		// 	source_id BLOB NOT NULL,
-		// 	file BLOB NOT NULL
-		// )`)
-		// createTable(`CREATE TABLE IF NOT EXISTS compilation_tasks (
-		// 	id BLOB PRIMARY KEY NOT NULL,
-		// 	source_id BLOB NOT NULL
-		// )`)
-
 	} else {
 		DB, err = sql.Open("sqlite3", "./database.sqlite")
 		if err != nil {
