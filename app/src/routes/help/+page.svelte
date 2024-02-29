@@ -11,17 +11,11 @@
     îți va verifica rezolvarea și acorda un punctaj.
   </p>
 
-  <div class="content">
-    <h2>Linkuri utile</h2>
-    <a href="https://github.com/lazarcloud/provocari-digitale/"
-      >Github Oficial</a
-    ><br />
-    <a
-      href="https://github.com/lazarcloud/provocari-digitale/blob/main/design/docs.pdf"
-      >Documentație proiect</a
-    ><br />
-    <a href="https://lazar.lol">Lazăr Dragoș George, creatorul Algorift</a>
-  </div>
+  <p>
+    Pentru ajutor ne puteți contacta la <a href="mailto:contact@lazar.lol"
+      >contact@lazar.lol</a
+    >
+  </p>
 </div>
 
 <style>
@@ -38,7 +32,7 @@
   }
   p,
   .content {
-    width: clamp(400px, 80%, 700px);
+    width: clamp(100px, 80%, 700px);
     margin: 0 auto;
   }
 </style>

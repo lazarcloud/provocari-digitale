@@ -57,7 +57,7 @@ func main() {
 	calculateScores(test_group_id, "compiling")
 	compileCPP("./main.cpp", "executable")
 	fmt.Println("Source code compiled successfully")
-
+	time.Sleep(2 * time.Second)
 	if isStandardIO == "true" && testingMode == "individualFiles" {
 		// loop through the test cases
 		for i := 0; i < numberOfTestCases; i++ {

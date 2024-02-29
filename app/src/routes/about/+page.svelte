@@ -50,7 +50,7 @@
   }
   p,
   .content {
-    width: clamp(400px, 80%, 700px);
+    width: clamp(100px, 80%, 700px);
     margin: 0 auto;
   }
 </style>

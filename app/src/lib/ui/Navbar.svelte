@@ -8,7 +8,8 @@
   $: if (url) {
     right = 0
     if (url == "/") right = 25
-    if (stringContains(url, "/problems/")) right = 19.4
+    if (stringContains(url, "/problems/") || stringContains(url, "/solves/"))
+      right = 19.4
     if (url == "/login/" || url == "/register/") right = 3.25
     if (url == "/help/") right = 14.2
     if (url == "/about/") right = 9.35
@@ -51,7 +52,10 @@
     </a>
     <a
       href="/problems"
-      class={stringContains(url, "/problems/") ? "active" : ""}
+      class={stringContains(url, "/problems/") ||
+      stringContains(url, "/solves/")
+        ? "active"
+        : ""}
       on:click={() => (show = false)}
       >Probleme
     </a>

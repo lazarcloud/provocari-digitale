@@ -111,10 +111,10 @@ func CreateTestContainer(problemID string, solution string, usedId string) (bool
 	hostConfig := &container.HostConfig{
 		AutoRemove:  true,
 		NetworkMode: "host",
-		Resources: container.Resources{
-			Memory: parseInt(problemData.MaxMemory) * 1024, //MB
+		Resources:   container.Resources{
+			// Memory: parseInt(problemData.MaxMemory) * 1024, //MB
 			// CPUPeriod: 100000,1
-			CPUQuota: 10000, // 10ms (10% of a single CPU core) //laptop 10000
+			// CPUQuota: 20000, // 10ms (10% of a single CPU core) //laptop 10000
 		},
 	}
 

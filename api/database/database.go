@@ -113,7 +113,7 @@ func Populate() {
 		uses_standard_io bool
 		test_mode        string
 	}{
-		{"1234", "100000", "300", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
+		{"1234", "100000", "500", "Citește două numere întregi din cin și afișează suma lor în cout.", "A + B", true, "individualFiles"},
 		{"132", "400000", "1000", "Citește două numere întregi din cin și afișează cmmdc al lor în cout. Daca sunt prime intre ele afisează 0.", "CMMDC", true, "individualFiles"},
 		{"1327", "650000", "1200", "Gigel, intr-o zi cand isi facea temele la matematica, s-a apucat sa scrie pe o foaie de hartie, un sir de fractii ireductibile de forma P/Q cu 1 ≤ P,Q ≤ N, unde N este un numar natural ales de el. De exemplu, pentru N = 4 el a obtinut urmatorul sir: <br> 1/1 1/2 1/3 1/4 2/1 2/3 3/1 3/2 3/4 4/1 4/3 <br> Gigel s-a apucat apoi sa numere cate fractii a obtinut pentru N = 4 si a vazut ca sunt 11. <br>Fiind dat un numar natural N in cin, sa se determine cate fractii sunt in sirul de fractii construit dupa regulile de mai sus si sa se afiseze in count.		", "Fractii", true, "individualFiles"},
 	}

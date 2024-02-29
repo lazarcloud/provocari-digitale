@@ -32,7 +32,7 @@
     font-size: clamp(1.5rem, 5vw, 2rem);
   }
   .content {
-    width: clamp(400px, 80%, 700px);
+    width: clamp(100px, 80%, 700px);
     margin: 0 auto;
   }
 </style>
