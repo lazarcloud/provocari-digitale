@@ -177,8 +177,9 @@
 
 <style>
   div.container {
-    margin: 10px;
+    margin: 10px auto;
     padding: 10px;
+    max-width: 700px;
   }
   table {
     width: 100%;

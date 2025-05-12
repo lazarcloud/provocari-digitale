@@ -12,7 +12,7 @@ userData.subscribe((value) => {
 
 var baseUrl = "http://localhost:8080"
 var token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaXNzdWVyIjoibGF6YXIiLCJpc3N1ZWRBdCI6MTcwNzc2OTg4OCwiZXhwaXJlc0F0IjoxNzQzNzY5ODg4LCJ1c2VySWQiOiIiLCJhY2Nlc3NSb2xlIjoicHVibGljIn0.YEXte-T7r6ax6Hopzt6KYoesj7Ia-caf7dlWrHGnVEs"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaXNzdWVyIjoibGF6YXIiLCJpc3N1ZWRBdCI6MTc0NzAzNTYwOSwiZXhwaXJlc0F0IjoxNzgzMDM1NjA5LCJ1c2VySWQiOiIiLCJhY2Nlc3NSb2xlIjoicHVibGljIn0.ChS2LO7psqBSMslqgScWYlj-bWDJAy3PuyKma5FXaQc"
 export async function fetchAPI(path = "", options = {}) {
   options.headers = {
     ...options.headers,
