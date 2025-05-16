@@ -39,7 +39,7 @@ jobs:
           CONTAINER_NAME: provocari-digitale
           IMAGE_NAME: monsieurlazar/provocari-digitale
           TRAEFIK_ROUTER_NAME: provocari-digitale
-          DOMAIN: ctf.lazar.lol
+          DOMAIN: ctf.bylazar.com
           PORT: 80
         run: |
           sudo docker stop $CONTAINER_NAME || true

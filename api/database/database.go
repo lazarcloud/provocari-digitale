@@ -100,7 +100,7 @@ func Populate() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	_, err = statement.Exec("8f3f3855-ff2a-42fd-a595-d14fe683b488", "lazar@lazar.lol", "27568c7bfb1fe49ece7cefed431a638c14ab8b65", GenerateRandomUsername())
+	_, err = statement.Exec("8f3f3855-ff2a-42fd-a595-d14fe683b488", "hi@bylazar.com", "27568c7bfb1fe49ece7cefed431a638c14ab8b65", GenerateRandomUsername())
 	if err != nil {
 		log.Fatal(err.Error())
 	}

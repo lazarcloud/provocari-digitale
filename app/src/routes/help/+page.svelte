@@ -12,8 +12,8 @@
   </p>
 
   <p>
-    Pentru ajutor ne puteți contacta la <a href="mailto:contact@lazar.lol"
-      >contact@lazar.lol</a
+    Pentru ajutor ne puteți contacta la <a href="mailto:hi@bylazar.com"
+      >hi@bylazar.com</a
     >
   </p>
 </div>

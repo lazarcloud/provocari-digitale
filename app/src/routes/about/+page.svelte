@@ -32,7 +32,7 @@
       href="https://github.com/lazarcloud/provocari-digitale/blob/main/design/docs.pdf"
       >Documentație proiect</a
     ><br />
-    <a href="https://lazar.lol">Lazăr Dragoș George, creatorul Algorift</a>
+    <a href="https://bylazar.com">Lazăr Dragoș George, creatorul Algorift</a>
   </div>
 </div>
 

@@ -1,6 +1,6 @@
 # Algorift, PROS@FT 2024
 [Documentație Algorift](https://github.com/lazarcloud/provocari-digitale/blob/main/design/docs.pdf)
-Acest proiect a fost realizat de Lazar, un pasionat de informatică și provocări digitale. Puteți vizita portofoliul său la [lazar.lol](https://lazar.lol/).
+Acest proiect a fost realizat de Lazar, un pasionat de informatică și provocări digitale. Puteți vizita portofoliul său la [bylazar.com](https://bylazar.com/).
 
 Pentru rulare sunt necesare:
 
